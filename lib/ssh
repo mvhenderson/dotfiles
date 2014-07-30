@@ -1,0 +1,42 @@
+#!/usr/bin/env bash
+
+ssh_key_file="${HOME}/.ssh/id_rsa.pub"
+
+# Check if SSH key exists, if not create it
+check_ssh() {
+    if ssh_key_exists; then
+        log_success "SSH key found"
+    else
+        ask_confirmation "SSH key not found, would you like to set one up?"
+        [[ is_confirmed ]] || log_fatal "SSH key required"
+        [[ ssh_create_key ]] || log_fatal "Failed to create ssh key"
+        $dry_run [[ ssh_key_exists ]] \
+            && log_success "SSH key generated" \
+            || log_fatal "Generated SSH key not found"
+    fi
+}
+
+ssh_key_exists() {
+    [[ -r "$ssh_key_file" ]] || return 1
+    return 0
+}
+
+# Setup SSH Key
+# https://help.github.com/articles/generating-ssh-keys
+ssh_create_key() {
+    local email="$1"
+
+    if -z $email; then
+        ask "Email address for the key: " && printf "\n"
+        email="$(get_answer)"
+    fi
+
+    $dry_run ssh-keygen -t rsa -C "${email}" >> $log_file 2>&1
+}
+
+ssh_copy_key() {
+    case $os in
+        osx) cat "$ssh_key_file" | pbcopy ;;
+        *) ;; #todo
+    esac
+}

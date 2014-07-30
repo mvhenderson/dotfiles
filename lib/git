@@ -1,0 +1,109 @@
+#!/usr/bin/env bash
+
+# Confirm ssh key setup on GitHub
+# Assumes ok if the current directory is already a git repo
+check_github_ssh() {
+	if is_git_repo; then
+		log_success "GitHub SSH already setup"
+	else
+		if ! github_check_key; then
+		    $dry_run ssh_copy_key \
+		    	&& log_success "SSH key copied to clipboard" \
+		    	|| log_fatal "Failed to copy key"
+		    
+
+		    if $os == "osx"; then
+			    $dry_run open "https://github.com/settings/ssh"
+			fi
+
+			if [[ ! $is_dry_run ]]; then
+			    while :
+			    do
+			    	ask_anykey
+			        [[ github_check_key ]] && break
+			        log_warning "GitHub SSH still not working"
+			    done
+			fi
+			e_success "GitHub SSH setup"
+		fi	
+	fi
+}
+
+check_git() {
+	if type_exists 'git'; then
+		log_success "Git found"
+	else
+		case $os in
+      		osx*)
+				log_step "Installing git..."
+				$dry_run brew install git >> $log_file 2>&1 \
+					&& log_success "Installed git" \
+					|| log_fatal "Failed to install git"
+		        ;;
+			*)
+				log_fatal "Unable to install git"
+				;;
+		esac
+	fi
+}
+
+check_git_repo() {
+	if is_git_repo; then
+		log_success "Is a git repository"
+	else
+		log_step "Initializing repository..."
+	    $dry_run git init >> $log_file 2>&1 \
+	    	|| log_fatal "Failed to initialize repository"
+
+		log_step "Adding remote..."
+	    $dry_run git remote add origin ${DOTFILES_GIT_REMOTE} >> $log_file 2>&1 \
+	    	|| log_fatal "Failed to add remote"
+
+	    log_step "Fetching origin..."
+	    $dry_run git fetch origin master >> $log_file 2>&1 \
+	    	|| log_fatal "Failed to fetch origin"
+
+	    log_step "Resetting working tree..."
+	    $dry_run git reset --hard FETCH_HEAD \
+	    	|| log_fatal "Failed to reset to HEAD"
+
+	    log_step "Cleaning..."
+	    $dry_run git clean -fd >> $log_file 2>&1 \
+	    	|| log_warning "Failed to clean git clone"
+
+	    log_step "Double checking clone..."
+	    $dry_run is_git_repo \
+	    	&& log_success "Repository initialized" \
+	    	|| log_fatal "Failed to initialize git repository"
+	fi
+}
+
+# Test whether we're in a git repo
+is_git_repo() {
+    $(git rev-parse --is-inside-work-tree &> /dev/null)
+}
+
+# Test the default SSH key against github
+github_check_key() {
+    $(ssh -T git@github.com &> /dev/null)
+}
+
+# sync repository
+git_sync() {
+	# Should probably use plumbing command(s) here, but this works
+	# See: http://stackoverflow.com/questions/3878624/how-do-i-programmatically-determine-if-there-are-uncommited-changes
+	log_step "Checking for uncommited changes..."
+	[[ -z $(git status -s) ]] \
+		&& log_success "Working directory clean" \
+		|| $dry_run log_fatal "Uncommited changes found, please commit or stash them"
+
+	log_step "Pulling from origin..."
+    $dry_run git pull --rebase origin master >> $log_file 2>&1 \
+		&& log_success "Origin fetched and rebased" \
+		|| log_error "Failed to rebase from origin"
+
+	log_step "Updating submodules..."
+    $dry_run git submodule update --recursive --init --quiet >> $log_file 2>&1 \
+    	&& log_success "Submodules updated" \
+    	|| log_error "Failed to update submodules"
+}

@@ -1,0 +1,5 @@
+#!/usr/bin/env bash
+
+run_link() {
+	return 0
+}

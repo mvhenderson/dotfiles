@@ -1,0 +1,27 @@
+#!/usr/bin/env bash
+# Credit: https://github.com/necolas/dotfiles
+
+run_help() {
+
+cat <<EOT
+dotfiles - Mike Henderson - http://mvhenderson.github.io
+
+Usage: $(basename "$0") [options]
+
+Options:
+    -h, --help      Print this help text
+    --dry-run       Runs the installer without making any changes
+    --no-link       Skip linking phase
+    --no-modules    Suppress module updates (npm, gem, etc)
+    --no-packages   Suppress package updates (brew, apt, etc)
+    --no-prereq     Skip prerequsite checks
+    --no-sync       Suppress pulling from the remote repository
+
+Documentation can be found at https://github.com/mvhenderson/dotfiles/
+
+Copyright (c) 2014 Mike Henderson
+Licensed under the MIT license.
+EOT
+
+exit
+}

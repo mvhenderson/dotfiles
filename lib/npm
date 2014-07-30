@@ -1,0 +1,26 @@
+#!/usr/bin/env bash
+
+
+declare -a npm_modules=(
+    'bower'
+    'grunt-cli'
+    'jshint'
+    'yo'
+)
+
+run_npm() {
+	type_exists 'npm' || log_fatal "npm not found"
+
+    log_info "Installing npm modules..."
+    local installed=$(npm list --global --depth=0)
+    for item in ${npm_modules[@]}; do
+        if [[ $installed =~ " $item@" ]]; then
+            log_neutral "$item"
+        else
+            log_step "Installing $item..."
+            $dry_run npm install --global "$item" >> $log_file 2>&1 \
+                && log_success "Installed $item" \
+                || log_error "Failed to instal $item"
+        fi
+    done
+}

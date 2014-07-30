@@ -1,0 +1,94 @@
+#!/usr/bin/env bash
+# Initialize/sync dotfiles clone and install apps/packages
+
+DOTFILES_DIRECTORY="${HOME}/.dotfiles"
+DOTFILES_REPOSITORY="mvhenderson/dotfiles"
+
+DOTFILES_GIT_TARBALL="https://github.com/${DOTFILES_REPOSITORY}/tarball/master"
+DOTFILES_GIT_REMOTE="git@github.com:${DOTFILES_REPOSITORY}.git"
+
+# Ensure not running as root
+if [ $EUID == 0 ]; then
+	echo "Do not run as root. Aborting."
+	exit
+fi
+
+# If missing, download and extract the dotfiles repository
+if [[ ! -d ${DOTFILES_DIRECTORY} ]]; then
+    printf "Initializing directory ${DOTFILES_DIRECTORY}..."
+
+	tmpfile="${TMPDIR:-${TEMP:-/tmp}}/$(mktemp -u XXXXX.tgz)"
+
+    mkdir "${DOTFILES_DIRECTORY}" || exit
+	curl -fsSLo "${tmpfile}" ${DOTFILES_GIT_TARBALL} || exit
+    tar -zxf "${tmpfile}" --strip-components 1 -C "${DOTFILES_DIRECTORY}" #no exit
+    rm -f "${tmpfile}"
+
+    if [ ! -x "${DOTFILES_DIRECTORY}/bin/dotfiles" ]; then
+    	printf "FAILED\n"
+    	exit
+    fi
+    printf "done\n"
+    unset tmpfile
+fi
+
+# Load the library functions
+cd ${DOTFILES_DIRECTORY}
+for f in ./lib/*; do 
+	source $f || exit
+done
+
+# Parse command line options
+is_dry_run=false
+dry_run=;
+for opt in $@; do
+    case $opt in
+    	--dry-run) 
+			is_dry_run=true 
+			dry_run=log_dryrun
+			;;
+        --no-modules) no_modules=true ;;
+        --no-packages) no_packages=true ;;
+		--no-link) no_link=true ;;
+        --no-sync) no_sync=true ;;
+		--no-prereq) no_prereq=true ;;
+		-h|--help) run_help ;;
+        -*|--*) e_warning "Warning: invalid option $opt" ;;
+    esac
+done
+
+log_init
+
+if [[ ! $no_prereq ]]; then
+	log_header "Prerequsites"
+	check_os
+	check_ssh
+	check_github_ssh
+	check_package_manager
+	check_build_tools
+	check_git
+	check_git_repo
+fi
+
+if [[ ! $no_sync ]]; then
+	log_header "Synchronizing repository"
+	git_sync
+fi
+
+if [[ ! $no_packages ]]; then
+	log_header "Install Packages"
+	run_packages
+fi
+
+if [[ ! $no_modules ]]; then
+	log_header "Install Modules"
+	run_npm
+fi
+
+if [[ ! $no_link ]]; then
+	log_header "Linking"
+	run_link
+fi
+
+log_summary
+

@@ -1,96 +1,96 @@
 #!/usr/bin/env bash
 
 declare -a brew_taps=(
-	'caskroom/cask'
-	'homebrew/dupes'
-	'homebrew/versions'
+    'caskroom/cask'
+    'homebrew/dupes'
+    'homebrew/versions'
 )
 
 declare -a brew_formulae=(
-	'coreutils'
-	'git'
-	'bash'
-	'bash-completion'
-	'node'
-	'tree'
-	'wget'
-	'jq'
-	'openssl'
-	'brew-cask'
-	'homebrew/dupes/rsync'
+    'coreutils'
+    'git'
+    'bash'
+    'bash-completion'
+    'node'
+    'tree'
+    'wget'
+    'jq'
+    'openssl'
+    'brew-cask'
+    'homebrew/dupes/rsync'
 )
 
 check_brew() {
-	if type_exists 'brew'; then
-		log_success "Homebrew found"
-	else
-		# no redirect here since homebrew will ask for sudu
-		log_info "Installing Homebrew..."
-		$dry_run ruby -e "$(curl -fsSL https://raw.github.com/Homebrew/homebrew/go/install)" \
-			&& log_success "Homebrew installed" \
-			|| log_fatal "Failed to install homebrew"
+    if type_exists 'brew'; then
+        log_success "Homebrew found"
+    else
+        # no redirect here since homebrew will ask for sudu
+        log_info "Installing Homebrew..."
+        $dry_run ruby -e "$(curl -fsSL https://raw.github.com/Homebrew/homebrew/go/install)" \
+            && log_success "Homebrew installed" \
+            || log_fatal "Failed to install homebrew"
 
-		log_step "Checking brew path..."
-		$dry_run type_exists 'brew' \
-			&& log_success "Brew in PATH" \
-			|| log_fatal "Failed to find brew command"
+        log_step "Checking brew path..."
+        $dry_run type_exists 'brew' \
+            && log_success "Brew in PATH" \
+            || log_fatal "Failed to find brew command"
 
-		log_step "Running brew doctor..."
-		$dry_run brew doctor \
-			&& log_success "Ready to brew" \
-			|| log_warning "Brew doctor failed"
+        log_step "Running brew doctor..."
+        $dry_run brew doctor \
+            && log_success "Ready to brew" \
+            || log_warning "Brew doctor failed"
 
-		log_step "Running brew update"
-		$dry_run brew update \
-			&& log_success "Brew updated" \
-			|| log_warning "Brew update failed"
-	fi
+        log_step "Running brew update"
+        $dry_run brew update \
+            && log_success "Brew updated" \
+            || log_warning "Brew update failed"
+    fi
 }
 
 run_brew() {
-	type_exists 'brew' || log_fatal "Homebrew not found"
+    type_exists 'brew' || log_fatal "Homebrew not found"
 
-	log_info "Updating taps..."
-	local -a installed_taps=($(brew tap))
-	local installed=" ${installed_taps[*]} "
-	for item in ${brew_taps[@]}; do
-		if [[ $installed =~ " $item " ]]; then
-			log_neutral "$item"
-		else
-			log_step "Tapping $item..."
-			$dry_run brew tap "$item" \
-				&& log_success "Tapped $item" \
-				|| log_error "Failed to tap $item"
-		fi
-	done
+    log_info "Updating taps..."
+    local -a installed_taps=($(brew tap))
+    local installed=" ${installed_taps[*]} "
+    for item in ${brew_taps[@]}; do
+        if [[ $installed =~ " $item " ]]; then
+            log_neutral "$item"
+        else
+            log_step "Tapping $item..."
+            $dry_run brew tap "$item" \
+                && log_success "Tapped $item" \
+                || log_error "Failed to tap $item"
+        fi
+    done
 
-	log_info "Updating formulae..."
-	$dry_run brew update \
-		&& log_success "Homebrew updated" \
-		|| log_warning "Failed to update Homebrew"
+    log_info "Updating formulae..."
+    $dry_run brew update \
+        && log_success "Homebrew updated" \
+        || log_warning "Failed to update Homebrew"
 
-	log_info "Installing formulae..."
-	for index in ${!brew_formulae[*]}
-	do
-		if formula_exists ${brew_formulae[$index]}; then
-			log_neutral "${brew_formulae[$index]}"
-		else
-			log_step "Brewing ${brew_formulae[$index]}..."
-			$dry_run brew install "${brew_formulae[$index]}" \
-				&& log_success "${brew_formulae[$index]}" \
-				|| log_error "${brew_formulae[$index]}"
-		fi
-	done
+    log_info "Installing formulae..."
+    for index in ${!brew_formulae[*]}
+    do
+        if formula_exists ${brew_formulae[$index]}; then
+            log_neutral "${brew_formulae[$index]}"
+        else
+            log_step "Brewing ${brew_formulae[$index]}..."
+            $dry_run brew install "${brew_formulae[$index]}" \
+                && log_success "${brew_formulae[$index]}" \
+                || log_error "${brew_formulae[$index]}"
+        fi
+    done
 
-	log_info "Cleaning outdated formulae..."
-	$dry_run brew cleanup \
-		&& log_success "Formulae cleaned" \
-		|| log_warning "Failed to clean formulae"
+    log_info "Cleaning outdated formulae..."
+    $dry_run brew cleanup \
+        && log_success "Formulae cleaned" \
+        || log_warning "Failed to clean formulae"
 }
 
 # Test whether a Homebrew formula is already installed
 # $1 - formula name (may include options)
 formula_exists() {
-	[[ -n $(brew list $1) ]] || return 1
-	return 0
+    [[ -n $(brew list $1) ]] || return 1
+    return 0
 }

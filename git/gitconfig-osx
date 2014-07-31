@@ -1,39 +1,39 @@
 [core]
-	editor = vim
+    editor = vim
 
 [color]
-	ui = auto
+    ui = auto
 
 [diff]
-	tool = vimdiff
-	guitool = bc4
+    tool = vimdiff
+    guitool = bc4
 
 [difftool]
-	prompt = false
+    prompt = false
 
 [merge]
-	tool = bc4
-	conflictstyle = diff3
-	log = true
+    tool = bc4
+    conflictstyle = diff3
+    log = true
 
 [mergetool]
-	prompt = false
-	keepBackup = false
+    prompt = false
+    keepBackup = false
 
 [difftool "sourcetree"]
-	cmd = /usr/local/bin/bcomp \"$LOCAL\" \"$REMOTE\"
-	path =
+    cmd = /usr/local/bin/bcomp \"$LOCAL\" \"$REMOTE\"
+    path =
 
 [mergetool "sourcetree"]
-	cmd = /usr/local/bin/bcomp \"$LOCAL\" \"$REMOTE\" \"$BASE\" \"$MERGED\"
-	trustExitCode = true
+    cmd = /usr/local/bin/bcomp \"$LOCAL\" \"$REMOTE\" \"$BASE\" \"$MERGED\"
+    trustExitCode = true
 
 [difftool "bc4"]
-	cmd = /usr/local/bin/bcomp \"$LOCAL\" \"$REMOTE\"
+    cmd = /usr/local/bin/bcomp \"$LOCAL\" \"$REMOTE\"
 
 [mergetool "bc4"]
-	cmd = /usr/local/bin/bcomp \"$LOCAL\" \"$REMOTE\" \"$BASE\" \"$MERGED\"
-	trustExitCode = true
+    cmd = /usr/local/bin/bcomp \"$LOCAL\" \"$REMOTE\" \"$BASE\" \"$MERGED\"
+    trustExitCode = true
 
 [push]
-	default = simple
+    default = simple

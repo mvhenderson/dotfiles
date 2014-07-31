@@ -1,21 +1,21 @@
 #!/usr/bin/env bash
 
 check_xcode() {
-	if is_xcode_installed; then
-		log_success "Found XCode Command Line Tools"
-	else
-		log_info "Installing XCode Command Line Tools via GUI popup"
-		$dry_run sudo /usr/bin/xcode-select --install
-		$dry_run ask_anykey
-		$dry_run is_xcode_installed \
-			&& log_success "XCode Command Line Tools installed" \
-			|| log_fatal "Failed to install XCode Command Line Tools"
-	fi
+    if is_xcode_installed; then
+        log_success "Found XCode Command Line Tools"
+    else
+        log_info "Installing XCode Command Line Tools via GUI popup"
+        $dry_run sudo /usr/bin/xcode-select --install
+        $dry_run ask_anykey
+        $dry_run is_xcode_installed \
+            && log_success "XCode Command Line Tools installed" \
+            || log_fatal "Failed to install XCode Command Line Tools"
+    fi
 }
 
 is_xcode_installed() {
-	/usr/bin/xcode-select -p &>/dev/null || return 1
-	return 0
+    /usr/bin/xcode-select -p &>/dev/null || return 1
+    return 0
 }
 
 

@@ -6,81 +6,81 @@ declare -i warning_count=0
 CLEAR_LINE="\r\e[0K"
 
 log_summary() {
-	printf "\n"
-	$is_dry_run && printf "${COLOR_BRIGHT_VIOLET}Dry run, no changes made\n"
+    printf "\n"
+    $is_dry_run && printf "${COLOR_BRIGHT_VIOLET}Dry run, no changes made\n"
 
-	if [[ $error_count > 0 ]]; then
-		printf "${COLOR_BRIGHT_RED}Done. Errors: ${error_count}"
-	elif [[ $warning_count > 0 ]]; then
-		printf "${COLOR_BRIGHT_YELLOW}Done. Warnings: ${warning_count}"
-	else
-		printf "${COLOR_BRIGHT_GREEN}Done"
-	fi
-	printf "${COLOR_RESET}\n"
+    if [[ $error_count > 0 ]]; then
+        printf "${COLOR_BRIGHT_RED}Done. Errors: ${error_count}"
+    elif [[ $warning_count > 0 ]]; then
+        printf "${COLOR_BRIGHT_YELLOW}Done. Warnings: ${warning_count}"
+    else
+        printf "${COLOR_BRIGHT_GREEN}Done"
+    fi
+    printf "${COLOR_RESET}\n"
 }
 log_header() {
-	printf "\n${COLOR_BRIGHT_WHITE}$@${COLOR_RESET}\n"
+    printf "\n${COLOR_BRIGHT_WHITE}$@${COLOR_RESET}\n"
 }
 log_success() {
-	printf "${CLEAR_LINE} ${COLOR_BRIGHT_GREEN}✔${COLOR_RESET}  $@\n"
+    printf "${CLEAR_LINE} ${COLOR_BRIGHT_GREEN}✔${COLOR_RESET}  $@\n"
 }
 log_neutral() {
-	printf "${CLEAR_LINE} ${COLOR_BRIGHT_BLUE}-${COLOR_RESET}  $@\n"
+    printf "${CLEAR_LINE} ${COLOR_BRIGHT_BLUE}-${COLOR_RESET}  $@\n"
 }
 log_warning() {
-	let "warning_count++"
-	printf "${CLEAR_LINE} ${COLOR_BRIGHT_YELLOW}!${COLOR_RESET}  $@\n"
+    let "warning_count++"
+    printf "${CLEAR_LINE} ${COLOR_BRIGHT_YELLOW}!${COLOR_RESET}  $@\n"
 }
 log_error() {
-	let "error_count++"
-	printf "${CLEAR_LINE} ${COLOR_BRIGHT_RED}✖${COLOR_RESET}  $@\n"
+    let "error_count++"
+    printf "${CLEAR_LINE} ${COLOR_BRIGHT_RED}✖${COLOR_RESET}  $@\n"
 }
 log_step() {
-	printf "${CLEAR_LINE}    ${COLOR_BRIGHT_BLACK}$@${COLOR_RESET}\n"
+    printf "${CLEAR_LINE}    ${COLOR_BRIGHT_BLACK}$@${COLOR_RESET}\n"
 }
 log_info() {
-	printf "    ${COLOR_BRIGHT_BLACK}$@${COLOR_RESET}\n"
+    printf "    ${COLOR_BRIGHT_BLACK}$@${COLOR_RESET}\n"
 }
 log_fatal() {
-	printf "\n${COLOR_RED}$@${COLOR_RESET}\n"
-	exit
+    printf "\n${COLOR_RED}$@${COLOR_RESET}\n"
+    exit
 }
 log_question() {
-	printf "    ${COLOR_CYAN}$@${COLOR_RESET}"
+    printf "    ${COLOR_CYAN}$@${COLOR_RESET}"
 }
 log_dryrun() {
-	printf "\n      ${COLOR_VIOLET}$@${COLOR_RESET}\n"
+    printf "\n      ${COLOR_VIOLET}$@${COLOR_RESET}\n"
 }
 
 # Ask for string input
 ask() {
-	log_question "$@ > "
-	read
+    log_question "$@ > "
+    read
 }
 
 # Get the last answer
 get_answer() {
-	printf "$REPLY"
+    printf "$REPLY"
 }
 
 # Ask for confirmation before proceeding
 ask_confirmation() {
-	log_question "$@ (y/n) "
-	read -n 1
-	printf "\n"
+    log_question "$@ (y/n) "
+    read -n 1
+    printf "\n"
 }
 
 # Test whether the result of an 'ask' is a confirmation
 is_confirmed() {
-	if [[ "$REPLY" =~ ^[Yy]$ ]]; then
-		return 0
-	fi
-	return 1
+    if [[ "$REPLY" =~ ^[Yy]$ ]]; then
+        return 0
+    fi
+    return 1
 }
 
 # Ask for any input to continue
 ask_anykey() {
-	log_question "<< Press any key to continue, Ctrl-C to exit >>"
-	read -n 1
-	printf "\n"
+    log_question "<< Press any key to continue, Ctrl-C to exit >>"
+    read -n 1
+    printf "\n"
 }

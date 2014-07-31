@@ -14,7 +14,6 @@ Options:
     --no-link       Skip linking phase
     --no-modules    Suppress module updates (npm, gem, etc)
     --no-packages   Suppress package updates (brew, apt, etc)
-    --no-prereq     Skip prerequsite checks
     --no-sync       Suppress pulling from the remote repository
 
 Documentation can be found at https://github.com/mvhenderson/dotfiles/

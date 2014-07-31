@@ -3,30 +3,25 @@
 # Confirm ssh key setup on GitHub
 # Assumes ok if the current directory is already a git repo
 check_github_ssh() {
-	if is_git_repo; then
-		log_success "GitHub SSH already setup"
-	else
 		if ! github_check_key; then
 		    $dry_run ssh_copy_key \
 		    	&& log_success "SSH key copied to clipboard" \
 		    	|| log_fatal "Failed to copy key"
 		    
 
-		    if $os == "osx"; then
+		    if [[ $os == "osx" ]]; then
 			    $dry_run open "https://github.com/settings/ssh"
 			fi
 
-			if [[ ! $is_dry_run ]]; then
-			    while :
-			    do
-			    	ask_anykey
-			        [[ github_check_key ]] && break
-			        log_warning "GitHub SSH still not working"
-			    done
-			fi
-			e_success "GitHub SSH setup"
+		    while :
+		    do
+		    	ask_anykey
+		      github_check_key \
+		      	&& break \
+		      	|| log_warning "GitHub SSH still not working"
+		    done
 		fi	
-	fi
+		log_success "GitHub SSH working"
 }
 
 check_git() {
@@ -36,7 +31,7 @@ check_git() {
 		case $os in
       		osx*)
 				log_step "Installing git..."
-				$dry_run brew install git >> $log_file 2>&1 \
+				$dry_run brew install git \
 					&& log_success "Installed git" \
 					|| log_fatal "Failed to install git"
 		        ;;
@@ -52,24 +47,24 @@ check_git_repo() {
 		log_success "Is a git repository"
 	else
 		log_step "Initializing repository..."
-	    $dry_run git init >> $log_file 2>&1 \
+	    $dry_run git init \
 	    	|| log_fatal "Failed to initialize repository"
 
 		log_step "Adding remote..."
-	    $dry_run git remote add origin ${DOTFILES_GIT_REMOTE} >> $log_file 2>&1 \
+	    $dry_run git remote add origin ${DOTFILES_GIT_REMOTE} \
 	    	|| log_fatal "Failed to add remote"
 
 	    log_step "Fetching origin..."
-	    $dry_run git fetch origin master >> $log_file 2>&1 \
+	    $dry_run git fetch origin master \
 	    	|| log_fatal "Failed to fetch origin"
 
 	    log_step "Resetting working tree..."
 	    $dry_run git reset --hard FETCH_HEAD \
 	    	|| log_fatal "Failed to reset to HEAD"
 
-	    log_step "Cleaning..."
-	    $dry_run git clean -fd >> $log_file 2>&1 \
-	    	|| log_warning "Failed to clean git clone"
+	    # log_step "Cleaning..."
+	    # $dry_run git clean -fd \
+	    # 	|| log_warning "Failed to clean git clone"
 
 	    log_step "Double checking clone..."
 	    $dry_run is_git_repo \
@@ -80,12 +75,15 @@ check_git_repo() {
 
 # Test whether we're in a git repo
 is_git_repo() {
-    $(git rev-parse --is-inside-work-tree &> /dev/null)
+  git rev-parse --is-inside-work-tree &> /dev/null || return 1
+	return 0
 }
 
 # Test the default SSH key against github
 github_check_key() {
-    $(ssh -T git@github.com &> /dev/null)
+		local tmp=$(ssh -T git@github.com 2>&1)
+    [[  $tmp =~ "successfully authenticated" ]] || return 1
+    return 0
 }
 
 # sync repository
@@ -95,15 +93,72 @@ git_sync() {
 	log_step "Checking for uncommited changes..."
 	[[ -z $(git status -s) ]] \
 		&& log_success "Working directory clean" \
-		|| $dry_run log_fatal "Uncommited changes found, please commit or stash them"
+		|| log_fatal "Uncommited changes found, please commit or stash them"
+
+	log_step "Checking gitconfig..."
+	is_gitconfig_changed \
+		&& log_fatal "Global changes to gitconfig not in dotfiles repository" \
+		|| log_success "Global gitconfig unchanged"
 
 	log_step "Pulling from origin..."
-    $dry_run git pull --rebase origin master >> $log_file 2>&1 \
+    $dry_run git pull --rebase origin master \
 		&& log_success "Origin fetched and rebased" \
 		|| log_error "Failed to rebase from origin"
 
 	log_step "Updating submodules..."
-    $dry_run git submodule update --recursive --init --quiet >> $log_file 2>&1 \
+    $dry_run git submodule update --recursive --init --quiet \
     	&& log_success "Submodules updated" \
     	|| log_error "Failed to update submodules"
 }
+
+have_gitconfig() {
+	[[ -r "${HOME}/.gitconfig" ]] || return 1
+	return 0
+}
+
+read_gitconfig() {
+	git_name=$(git config --global user.name)
+	git_email=$(git config --global user.email)
+}
+
+prompt_gitconfig() {
+	log_info "Provide git name and email for SSH key creation and GitHub access"
+	
+	ask "Name"
+	git_name=$(get_answer)
+
+	ask "Email"
+	git_email=$(get_answer)
+}
+
+write_gitconfig() {
+	[[ -e "${HOME}/.gitconfig" ]] && $dry_run mv -f "${HOME}/.gitconfig" "${HOME}/.gitconfig.bak"
+
+	local src="./git/gitconfig-${distro}"
+	[[ -e "$src" ]] || src="./git/gitconfig-$os"
+
+	$dry_run cp -f "${src}" "${HOME}/.gitconfig"
+	$dry_run git config --global user.name "${git_name}"
+	$dry_run git config --global user.email "${git_email}"
+}
+
+
+is_gitconfig_changed() {
+	local src="./git/gitconfig-${distro}"
+	[[ -e "$src" ]] || src="./git/gitconfig-$os"
+
+	local cur="/tmp/gitconfig.cur"
+	local new="/tmp/gitconfig.new"
+
+	cat "${HOME}/.gitconfig" | egrep -v "(\[user\]|name = |email = )" >$cur
+	cat "${src}" | egrep -v "(\[user\]|name = |email = )" >$new
+
+	diff -B "${cur}" "${new}"
+	local diff=$(diff -B "${cur}" "${new}")
+
+	rm -f "${cur}" "${new}"
+
+	[[ -n $diff ]] || return 1
+	return 0
+}
+

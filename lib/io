@@ -3,29 +3,11 @@
 # Logging 
 declare -i error_count=0
 declare -i warning_count=0
-declare -r log_h1="================================================================================"
-declare -r log_h2="--------------------------------------------------------------------------------"
-log_file="/dev/null"
-
 CLEAR_LINE="\r\e[0K"
 
-log_init() {
-	if [[ -d "${HOME}/Library/Logs" ]]; then
-		log_file="${HOME}/Library/Logs/dotfiles.log"
-	else
-		log_file="/var/log/dotfiles.log"
-	fi
-
-	[[ -r "$log_file" ]] || touch "$log_file"
-	printf "\n\n${log_h1}\n$(date '+%Y-%m-%d %H:%M:%S')\n${log_h1}\n" >>$log_file
-}
-
 log_summary() {
-	printf "\nDone. Errors: $error_count Warnings: $warning_count\n" >>$log_file
-
 	printf "\n"
 	[[ $is_dry_run ]] && printf "${COLOR_BRIGHT_VIOLET}Dry run, no changes made\n"
-	printf "${COLOR_BRIGHT_BLACK}All output logged to ${log_file}\n"
 
 	if [[ $error_count > 0 ]]; then
 		printf "${COLOR_BRIGHT_RED}Done. Errors: ${error_count}"
@@ -37,44 +19,34 @@ log_summary() {
 	printf "${COLOR_RESET}\n"
 }
 log_header() {
-	printf "\n$@\n${log_h2}\n" >>$log_file
 	printf "\n${COLOR_BRIGHT_WHITE}$@${COLOR_RESET}\n"
 }
 log_success() { 
-	printf "\n<Success> $@\n" >>$log_file
 	printf "${CLEAR_LINE} ${COLOR_BRIGHT_GREEN}✔${COLOR_RESET}  $@\n"
 }
 log_neutral() { 
-	printf "\n<Neutral> $@\n" >>$log_file
 	printf "${CLEAR_LINE} ${COLOR_BRIGHT_BLUE}-${COLOR_RESET}  $@\n"
 }
 log_warning() { 
 	let "warning_count++"
-	printf "\n<Warning> $@\n" >>$log_file
 	printf "${CLEAR_LINE} ${COLOR_BRIGHT_YELLOW}!${COLOR_RESET}  $@\n"
 }
 log_error() { 
 	let "error_count++"
-	printf "\n<Error> $@\n" >>$log_file
 	printf "${CLEAR_LINE} ${COLOR_BRIGHT_RED}✖${COLOR_RESET}  $@\n"
 }
 log_step() { 
-	printf "\n<Step> $@\n" >>$log_file
-	printf "<Step> $@\n" | tr -C "\n" "-" >>$log_file
-	printf "${CLEAR_LINE}    ${COLOR_BRIGHT_BLACK}$@${COLOR_RESET}"
+	printf "${CLEAR_LINE}    ${COLOR_BRIGHT_BLACK}$@${COLOR_RESET}\n"
 }
 log_info() { 
-	printf "\n<Info> $@\n" >>$log_file
-	printf "<Info> $@\n" | tr -C "\n" "-" >>$log_file
 	printf "    ${COLOR_BRIGHT_BLACK}$@${COLOR_RESET}\n"
 }
 log_fatal() { 
-	printf "\n<Fatal> $@\n" >>$log_file
 	printf "\n${COLOR_RED}$@${COLOR_RESET}\n"
 	exit
 }
 log_question() { 
-	printf " ${COLOR_CYAN}    $@${COLOR_RESET}"
+	printf "    ${COLOR_CYAN}$@${COLOR_RESET}"
 }
 log_dryrun() {
 	printf "\n      ${COLOR_VIOLET}$@${COLOR_RESET}\n"

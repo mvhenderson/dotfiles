@@ -1,5 +1,45 @@
 #!/usr/bin/env bash
 
+check_package_manager() {
+    case $os in
+        osx*) check_brew ;;
+        *) ;; #todo
+    esac
+}
+
+check_build_tools() {
+    case $os in
+        osx*) check_xcode ;;
+        *) ;; #todo
+    esac
+}
+
+run_packages() {
+    case $os in
+        osx*) run_brew ;;
+        *) ;; #todo
+    esac
+}
+
+check_sudo() {
+    local need_sudo=false
+    case $io in
+        osx)
+            [[ ! is_xcode_installed || ! is_brew_installed ]] || need_sudo=true
+            ;;
+        *) ;; #todo
+    esac
+
+    # Ask for the administrator password upfront and keep-alive until finished
+    # NOTE: installing homebrew will invalidate the keep-alive :(
+    if $need_sudo; then
+        log_info "This system requires sudo for some operations"
+        sudo -k # invalidate any existing sudo
+        sudo -v # prompt for password
+        while true; do sudo -n true; sleep 60; kill -0 "$$" || exit; done 2>/dev/null &
+    fi
+}
+
 # Test whether a command exists
 # $1 - cmd to test
 # - https://github.com/necolas/dotfiles
@@ -12,7 +52,7 @@ type_exists() {
 
 # Setup the $os and $distro
 # See: http://linuxmafia.com/faq/Admin/release-files.html
-check_os() {
+setup_os() {
     case $OSTYPE in
       darwin*)
         os="osx"

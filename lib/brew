@@ -1,23 +1,23 @@
 #!/usr/bin/env bash
 
 declare -a brew_taps=(
-    'caskroom/cask'
-    'homebrew/dupes'
+    # 'caskroom/cask'
+    # 'homebrew/dupes'
     'homebrew/versions'
 )
 
 declare -a brew_formulae=(
-    'coreutils' # GNU core utilities (those that come with OS X are outdated)
-    'git'
-    'bash'
-    'bash-completion'
+    # 'coreutils' # GNU core utilities (those that come with OS X are outdated)
+    # 'git'
+    # 'bash'
+    # 'bash-completion'
     'node'
-    'tree'
-    'wget'
-    'jq'
-    'openssl'
-    'brew-cask'
-    'homebrew/dupes/rsync'
+    # 'tree'
+    # 'wget'
+    # 'jq'
+    # 'openssl'
+    # 'brew-cask'
+    # 'homebrew/dupes/rsync'
 )
 
 check_brew() {
@@ -26,7 +26,7 @@ check_brew() {
     else
         # no redirect here since homebrew will ask for sudu
         log_info "Installing Homebrew..."
-        $dry_run ruby -e "$(curl -fsSkL raw.github.com/mxcl/homebrew/go)" \
+        $dry_run ruby -e "$(curl -fsSL https://raw.github.com/Homebrew/homebrew/go/install)" \
             && log_success "Homebrew installed" \
             || log_fatal "Failed to install homebrew"
 
@@ -36,12 +36,12 @@ check_brew() {
             || log_fatal "Failed to find brew command"
 
         log_step "Running brew doctor..."
-        $dry_run brew doctor >> $log_file 2>&1 \
+        $dry_run brew doctor \
             && log_success "Ready to brew" \
             || log_warning "Brew doctor failed"
 
         log_step "Running brew update"
-        $dry_run brew update >> $log_file 2>&1 \
+        $dry_run brew update \
             && log_success "Brew updated" \
             || log_warning "Brew update failed"
     fi
@@ -58,14 +58,14 @@ run_brew() {
             log_neutral "$item"
         else
             log_step "Tapping $item..."
-            $dry_run brew tap "$item" >> $log_file 2>&1 \
+            $dry_run brew tap "$item" \
                 && log_success "Tapped $item" \
                 || log_error "Failed to tap $item"
         fi
     done
 
     log_info "Updating formulae..."
-    $dry_run brew update >> $log_file 2>&1 \
+    $dry_run brew update \
         && log_success "Homebrew updated" \
         || log_warning "Failed to update Homebrew"
 
@@ -76,14 +76,14 @@ run_brew() {
             log_neutral "${brew_formulae[$index]}"
         else
             log_step "Brewing ${brew_formulae[$index]}..."
-            $dry_run brew install "${brew_formulae[$index]}" >> $log_file 2>&1 \
+            $dry_run brew install "${brew_formulae[$index]}" \
                 && log_success "${brew_formulae[$index]}" \
                 || log_error "${brew_formulae[$index]}"
         fi
     done
 
     log_info "Cleaning outdated formulae..."
-    $dry_run brew cleanup >> $log_file 2>&1 \
+    $dry_run brew cleanup \
         && log_success "Formulae cleaned" \
         || log_warning "Failed to clean formulae"
 }

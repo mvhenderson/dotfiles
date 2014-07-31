@@ -2,10 +2,10 @@
 
 
 declare -a npm_modules=(
-    'bower'
-    'grunt-cli'
+    # 'bower'
+    # 'grunt-cli'
     'jshint'
-    'yo'
+    # 'yo'
 )
 
 run_npm() {
@@ -18,7 +18,7 @@ run_npm() {
             log_neutral "$item"
         else
             log_step "Installing $item..."
-            $dry_run npm install --global "$item" >> $log_file 2>&1 \
+            $dry_run npm install --global "$item" \
                 && log_success "Installed $item" \
                 || log_error "Failed to instal $item"
         fi

@@ -75,7 +75,6 @@ check_ssh
 check_github_ssh
 check_git
 check_git_repo
-write_gitconfig
 
 if [[ ! $no_sync ]]; then
 	log_header "Synchronizing repository"
@@ -95,6 +94,7 @@ fi
 if [[ ! $no_link ]]; then
 	log_header "Linking"
 	run_link
+  write_gitconfig
 fi
 
 log_summary

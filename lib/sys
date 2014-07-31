@@ -1,85 +1,85 @@
 #!/usr/bin/env bash
 
 check_package_manager() {
-    case $os in
-        osx*) check_brew ;;
-        *) ;; #todo
-    esac
+	case $os in
+		osx*) check_brew ;;
+		*) ;; #todo
+	esac
 }
 
 check_build_tools() {
-    case $os in
-        osx*) check_xcode ;;
-        *) ;; #todo
-    esac
+	case $os in
+		osx*) check_xcode ;;
+		*) ;; #todo
+	esac
 }
 
 run_packages() {
-    case $os in
-        osx*) run_brew ;;
-        *) ;; #todo
-    esac
+	case $os in
+		osx*) run_brew ;;
+		*) ;; #todo
+	esac
 }
 
 check_sudo() {
-    local need_sudo=false
-    case $io in
-        osx)
-            [[ ! is_xcode_installed || ! is_brew_installed ]] || need_sudo=true
-            ;;
-        *) ;; #todo
-    esac
+	local need_sudo=false
+	case $io in
+		osx)
+			[[ ! is_xcode_installed || ! is_brew_installed ]] || need_sudo=true
+			;;
+		*) ;; #todo
+	esac
 
-    # Ask for the administrator password upfront and keep-alive until finished
-    # NOTE: installing homebrew will invalidate the keep-alive :(
-    if $need_sudo; then
-        log_info "This system requires sudo for some operations"
-        sudo -k # invalidate any existing sudo
-        sudo -v # prompt for password
-        while true; do sudo -n true; sleep 60; kill -0 "$$" || exit; done 2>/dev/null &
-    fi
+	# Ask for the administrator password upfront and keep-alive until finished
+	# NOTE: installing homebrew will invalidate the keep-alive :(
+	if $need_sudo; then
+		log_info "This system requires sudo for some operations"
+		sudo -k # invalidate any existing sudo
+		sudo -v # prompt for password
+		while true; do sudo -n true; sleep 60; kill -0 "$$" || exit; done 2>/dev/null &
+	fi
 }
 
 # Test whether a command exists
 # $1 - cmd to test
 # - https://github.com/necolas/dotfiles
 type_exists() {
-    if [ $(type -P $1) ]; then
-      return 0
-    fi
-    return 1
+	if [ $(type -P $1) ]; then
+		return 0
+	fi
+	return 1
 }
 
 # Setup the $os and $distro
 # See: http://linuxmafia.com/faq/Admin/release-files.html
 setup_os() {
-    case $OSTYPE in
-      darwin*)
-        os="osx"
-        if [ $(compare_versions "$(sw_vers -productVersion)" "10.9") == '<' ]; then
-            log_error "OS X 10.9.0+ required"
-            return 1
-        fi
-        ;;
-      linux*)
-        os="linux"
-        if [[ -e "/etc/lsb-release" ]]; then
-            distro="ubuntu" 
-        elif [[ -e "/etc/debian_release" || -e "/etc/debian_version" ]]; then
-            distro="debian"
-        elif [[ -e "/etc/redhat-release" || -e "/etc/redhat-version" ]]; then
-            distro="redhat"
-        elif [[ -e "/etc/fedora-release" ]]; then
-            distro="fedora"
-        else
-            log_error "Unsupported linux distro"
-            return 1
-        fi
-        ;;
-      *)
-        log_error "Unsupported OS"
-        return 1
-        ;;
-    esac
-    return 0
+	case $OSTYPE in
+		darwin*)
+			os="osx"
+			if [ $(compare_versions "$(sw_vers -productVersion)" "10.9") == '<' ]; then
+				log_error "OS X 10.9.0+ required"
+				return 1
+			fi
+			;;
+		linux*)
+			os="linux"
+			if [[ -e "/etc/lsb-release" ]]; then
+				distro="ubuntu"
+			elif [[ -e "/etc/debian_release" || -e "/etc/debian_version" ]]; then
+				distro="debian"
+			elif [[ -e "/etc/redhat-release" || -e "/etc/redhat-version" ]]; then
+				distro="redhat"
+			elif [[ -e "/etc/fedora-release" ]]; then
+				distro="fedora"
+			else
+				log_error "Unsupported linux distro"
+				return 1
+			fi
+			;;
+		*)
+			log_error "Unsupported OS"
+			return 1
+			;;
+	esac
+	return 0
 }

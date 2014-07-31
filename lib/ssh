@@ -4,32 +4,32 @@ ssh_key_file="${HOME}/.ssh/id_rsa"
 
 # Check if SSH key exists, if not create it
 check_ssh() {
-    if ssh_key_exists; then
-        log_success "SSH key found"
-    else
-        ask_confirmation "SSH key not found, would you like to set one up?"
-        is_confirmed || log_fatal "SSH key required"
-        ssh_create_key || log_fatal "Failed to create ssh key"
-        $dry_run ssh_key_exists \
-            && log_success "SSH key generated" \
-            || log_fatal "Generated SSH key not found"
-    fi
+	if ssh_key_exists; then
+		log_success "SSH key found"
+	else
+		ask_confirmation "SSH key not found, would you like to set one up?"
+		is_confirmed || log_fatal "SSH key required"
+		ssh_create_key || log_fatal "Failed to create ssh key"
+		$dry_run ssh_key_exists \
+			&& log_success "SSH key generated" \
+			|| log_fatal "Generated SSH key not found"
+	fi
 }
 
 ssh_key_exists() {
-    [[ -r "$ssh_key_file" ]] || return 1
-    return 0
+	[[ -r "$ssh_key_file" ]] || return 1
+	return 0
 }
 
 # Setup SSH Key
 # https://help.github.com/articles/generating-ssh-keys
 ssh_create_key() {
-    $dry_run ssh-keygen -t rsa -C "${git_email}" -f "${ssh_key_file}"
+	$dry_run ssh-keygen -t rsa -C "${git_email}" -f "${ssh_key_file}"
 }
 
 ssh_copy_key() {
-    case $os in
-        osx) cat "$ssh_key_file.pub" | pbcopy ;;
-        *) ;; #todo
-    esac
+	case $os in
+		osx) cat "$ssh_key_file.pub" | pbcopy ;;
+		*) ;; #todo
+	esac
 }

@@ -66,15 +66,16 @@ if have_gitconfig; then
   read_gitconfig
 else
   prompt_gitconfig
-	log_header "Prerequsites"
-  check_build_tools
-  check_package_manager
-	check_ssh
-	check_github_ssh
-	check_git
-	check_git_repo
-  write_gitconfig
 fi
+
+log_header "Prerequsites"
+check_build_tools
+check_package_manager
+check_ssh
+check_github_ssh
+check_git
+check_git_repo
+write_gitconfig
 
 if [[ ! $no_sync ]]; then
 	log_header "Synchronizing repository"

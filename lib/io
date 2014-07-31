@@ -7,7 +7,7 @@ CLEAR_LINE="\r\e[0K"
 
 log_summary() {
 	printf "\n"
-	[[ $is_dry_run ]] && printf "${COLOR_BRIGHT_VIOLET}Dry run, no changes made\n"
+	$is_dry_run && printf "${COLOR_BRIGHT_VIOLET}Dry run, no changes made\n"
 
 	if [[ $error_count > 0 ]]; then
 		printf "${COLOR_BRIGHT_RED}Done. Errors: ${error_count}"

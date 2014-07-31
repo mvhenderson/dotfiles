@@ -1,7 +1,6 @@
 #!/usr/bin/env bash
 
 # Confirm ssh key setup on GitHub
-# Assumes ok if the current directory is already a git repo
 check_github_ssh() {
 		if ! github_check_key; then
 		    $dry_run ssh_copy_key \
@@ -140,8 +139,9 @@ write_gitconfig() {
 	$dry_run cp -f "${src}" "${HOME}/.gitconfig"
 	$dry_run git config --global user.name "${git_name}"
 	$dry_run git config --global user.email "${git_email}"
-}
 
+	log_success "gitconfig updated"
+}
 
 is_gitconfig_changed() {
 	local src="./git/gitconfig-${distro}"
@@ -153,12 +153,13 @@ is_gitconfig_changed() {
 	cat "${HOME}/.gitconfig" | egrep -v "(\[user\]|name = |email = )" >$cur
 	cat "${src}" | egrep -v "(\[user\]|name = |email = )" >$new
 
-	diff -B "${cur}" "${new}"
-	local diff=$(diff -B "${cur}" "${new}")
+	local diff=false
+	diff -B "${cur}" "${new}" || diff=true
+	echo "$diff"
 
 	rm -f "${cur}" "${new}"
 
-	[[ -n $diff ]] || return 1
+	[[ $diff ]] || return 1
 	return 0
 }
 

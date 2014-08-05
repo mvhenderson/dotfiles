@@ -1,5 +1,24 @@
 #!/usr/bin/env bash
-# Initialize/sync dotfiles clone and install apps/packages
+
+run_help() {
+cat <<EOT
+dotfiles - Mike Henderson - http://mvhenderson.github.io
+
+Initialize/sync dotfiles clone and install apps/packages
+
+Usage: $(basename "$0") [options]
+
+Options:
+    --dry-run       Runs the installer without making any changes
+    --no-sync       Suppress pulling from the remote repository
+    -h, --help      Print this help text
+
+Documentation can be found at https://github.com/mvhenderson/dotfiles/
+
+Copyright (c) 2014 Mike Henderson. Licensed under the MIT license.
+EOT
+exit
+}
 
 DOTFILES_DIRECTORY="${HOME}/.dotfiles"
 DOTFILES_REPOSITORY="mvhenderson/dotfiles"
@@ -47,9 +66,6 @@ for opt in $@; do
             is_dry_run=true
             dry_run=log_dryrun
             ;;
-        --no-modules) no_modules=true ;;
-        --no-packages) no_packages=true ;;
-        --no-link) no_link=true ;;
         --no-sync) no_sync=true ;;
         -h|--help) run_help ;;
         -*|--*) e_warning "Warning: invalid option $opt" ;;
@@ -62,6 +78,7 @@ setup_os
 # Ask for sudo, if needed, and keep alive
 check_sudo
 
+# Pull name/email from gitconfig otherwise prompt
 if have_gitconfig; then
     read_gitconfig
 else
@@ -81,21 +98,16 @@ if [[ ! $no_sync ]]; then
     git_sync
 fi
 
-if [[ ! $no_packages ]]; then
-    log_header "Install Packages"
-    run_packages
-fi
+log_header "Package Install"
+run_packages
 
-if [[ ! $no_modules ]]; then
-    log_header "Install Modules"
-    run_npm
-fi
+log_header "Module Install"
+run_npm
 
-if [[ ! $no_link ]]; then
-    log_header "Linking"
-    run_link
-    write_gitconfig
-fi
+log_header "Link"
+run_link
+
+log_header "Copy"
+write_gitconfig
 
 log_summary
-

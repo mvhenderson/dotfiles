@@ -1,0 +1,71 @@
+
+if has("autocmd")
+    " Load files for specific filetypes
+    filetype on
+    filetype indent on
+    filetype plugin on
+
+    " Languages with specific tabs/space requirements
+    autocmd FileType make setlocal ts=4 sts=4 sw=4 noexpandtab
+
+    " Automatically strip trailing whitespace on file save
+    autocmd BufWritePre *.css,*.html,*.js,*.json,*.md,*.php,*.py,*.rb,*.scss,*.sh,*.txt :call StripTrailingWhitespace()
+endif
+
+if has("cmdline_info")
+    " Show the cursor line and column number
+    set ruler
+
+    " Show partial commands in status line
+    set showcmd
+
+    " Show whether in insert or replace mode
+    set showmode
+endif
+
+if has("syntax")
+    " Enable syntax highlighting
+    syntax enable
+
+    " Set 256 color terminal support
+    set t_Co=256
+
+    " Set dark background
+    set background=dark
+
+    " Set colorscheme
+    silent! colorscheme solarized
+endif
+
+" Optimize for fast terminal connections
+set ttyfast
+
+" Use UTF-8 without BOM
+set encoding=utf-8 nobomb
+
+" No line wrapping
+set nowrap
+
+" Use 4 spaces for indentation
+set shiftwidth=4
+
+" Use 4 spaces for soft tab
+set softtabstop=4
+
+" Use 4 spaces for tab
+set tabstop=4
+
+" Expand tab to spaces
+set expandtab
+
+" Enable line numbers
+set number
+
+" Highlight current line
+set cursorline
+
+" Start scrolling three lines before the horizontal window border
+set scrolloff=3
+
+" Don’t reset cursor to start of line when moving around.
+set nostartofline

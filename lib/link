@@ -1,5 +1,34 @@
 #!/usr/bin/env bash
 
 run_link() {
-    return 0
+    link "shell/bashrc"       ".bashrc"
+    link "shell/bash_profile" ".bash_profile"
+    link "shell/inputrc"      ".inputrc"
+
+    link "conf/curlrc"        ".curlrc"
+    link "conf/editorconfig"  ".editorconfig"
+    link "conf/git/gitignore" ".gitignore"
+    link "conf/vim/vimrc"     ".vimrc"
+}
+
+# Link file to home only if target doesn't exist
+# $1 - source, relative to DOTFILES_DIRECTORY
+# $2 - target, relative to HOME
+link() {
+    local src="${DOTFILES_DIRECTORY}/${1}"
+    local dst="${HOME}/${2}"
+
+    if [[ -L "$dst" ]]; then
+        if [[ "$src" -ef "$dst" ]]; then
+            log_neutral "${dst}"
+        else
+            log_warning "${dst}: link exists to different target"
+        fi
+    elif [[ -e "$dst" ]]; then
+        log_warning "${dst}: target exists and is not a link"
+    else
+        $dry_run ln -sv "${src}" "${dst}" \
+            && log_success "${dst}" \
+            || log_error "${dst}: ln failed"
+    fi
 }

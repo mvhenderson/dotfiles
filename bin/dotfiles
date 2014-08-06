@@ -2,7 +2,7 @@
 
 run_help() {
 cat <<EOT
-dotfiles - Mike Henderson - http://mvhenderson.github.io
+dotfiles - Mike Henderson - https://github.com/mvhenderson/dotfiles/
 
 Initialize/sync dotfiles clone and install apps/packages
 
@@ -12,8 +12,6 @@ Options:
     --dry-run       Runs the installer without making any changes
     --no-sync       Suppress pulling from the remote repository
     -h, --help      Print this help text
-
-Documentation can be found at https://github.com/mvhenderson/dotfiles/
 
 Copyright (c) 2014 Mike Henderson. Licensed under the MIT license.
 EOT

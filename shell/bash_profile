@@ -1,18 +1,18 @@
 #!/usr/bin/env bash
 [ -n "$PS1" ] || return
 
-
 ##############################################################################
 # Environment options
 ##############################################################################
 
-# PATH (in reverse priority order)
-PATH="/usr/bin:/bin:/usr/sbin:/sbin"
-[[ -d "/usr/local/sbin" ]] && PATH="/usr/local/sbin:$PATH"
-[[ -d "/usr/local/bin" ]] && PATH="/usr/local/bin:$PATH"
-[[ -d "/usr/texbin" ]] && PATH="/usr/texbin:$PATH"
-[[ -d "$HOME/.bin" ]] && PATH="$HOME/.bin:$PATH"
-export PATH
+# http://stackoverflow.com/questions/370047/what-is-the-most-elegant-way-to-remove-a-path-from-the-path-variable-in-bash
+path_append ()  { path_remove $1; [[ -d "$1" ]] && export PATH="$PATH:$1"; }
+path_prepend () { path_remove $1; [[ -d "$1" ]] && export PATH="$1:$PATH"; }
+path_remove ()  { export PATH=`echo -n $PATH | awk -v RS=: -v ORS=: '$0 != "'$1'"' | sed 's/:$//'`; }
+
+path_prepend "/usr/local/bin"
+path_append "${HOME}/.dotfiles/bin"
+path_append "/usr/texbin"
 
 # Make vim the default editor
 export EDITOR="vim"
@@ -34,6 +34,8 @@ shopt -s nocaseglob
 shopt -s cdspell
 
 
+
+
 ##############################################################################
 # History
 ##############################################################################
@@ -44,10 +46,19 @@ export HISTFILESIZE=$HISTSIZE
 export HISTCONTROL="ignorespace:erasedups"
 
 # Make some commands not show up in history
+# TODO: man, cd .., ll, la, lsd, which *
 export HISTIGNORE="ls:cd:cd -:pwd:exit:date:* --help:&:[fb]g"
 
 # Append to the Bash history file, rather than overwriting it
 shopt -s histappend
+
+# Remove short dir from Terminal.app title and write every command to history
+PROMPT_COMMAND=${PROMPT_COMMAND//update_terminal_cwd;/}
+PROMPT_COMMAND=${PROMPT_COMMAND//history -a;/}
+export PROMPT_COMMAND="history -a; $PROMPT_COMMAND"
+
+
+
 
 ##############################################################################
 # Aliases
@@ -69,163 +80,23 @@ alias g="git"
 alias h="history"
 
 # ls
+# Detect which `ls` flavor is in use
+if ls --color > /dev/null 2>&1; then # GNU `ls`
+    alias ls="command ls --color"
+else # OS X `ls`
+    alias ls="command ls -G"
+fi
+# TODO export LS_COLORS='no=00:fi=00:di=01;34:ln=01;36:pi=40;33:so=01;35:do=01;35:bd=40;33;01:cd=40;33;01:or=40;31;01:ex=01;32:*.tar=01;31:*.tgz=01;31:*.arj=01;31:*.taz=01;31:*.lzh=01;31:*.zip=01;31:*.z=01;31:*.Z=01;31:*.gz=01;31:*.bz2=01;31:*.deb=01;31:*.rpm=01;31:*.jar=01;31:*.jpg=01;35:*.jpeg=01;35:*.gif=01;35:*.bmp=01;35:*.pbm=01;35:*.pgm=01;35:*.ppm=01;35:*.tga=01;35:*.xbm=01;35:*.xpm=01;35:*.tif=01;35:*.tiff=01;35:*.png=01;35:*.mov=01;35:*.mpg=01;35:*.mpeg=01;35:*.avi=01;35:*.fli=01;35:*.gl=01;35:*.dl=01;35:*.xcf=01;35:*.xwd=01;35:*.ogg=01;35:*.mp3=01;35:*.wav=01;35:'
 
-#####
-# TODO: removing ls colors for now until I have time to make it readable on dark background
-#
-# # Detect which `ls` flavor is in use
-# if ls --color > /dev/null 2>&1; then # GNU `ls`
-#         colorflag="--color"
-# else # OS X `ls`
-#         colorflag="-G"
-# fi
-#
-# # Always use color output for `ls`
-# alias ls="command ls ${colorflag}"
-# export LS_COLORS='no=00:fi=00:di=01;34:ln=01;36:pi=40;33:so=01;35:do=01;35:bd=40;33;01:cd=40;33;01:or=40;31;01:ex=01;32:*.tar=01;31:*.tgz=01;31:*.arj=01;31:*.taz=01;31:*.lzh=01;31:*.zip=01;31:*.z=01;31:*.Z=01;31:*.gz=01;31:*.bz2=01;31:*.deb=01;31:*.rpm=01;31:*.jar=01;31:*.jpg=01;35:*.jpeg=01;35:*.gif=01;35:*.bmp=01;35:*.pbm=01;35:*.pgm=01;35:*.ppm=01;35:*.tga=01;35:*.xbm=01;35:*.xpm=01;35:*.tif=01;35:*.tiff=01;35:*.png=01;35:*.mov=01;35:*.mpg=01;35:*.mpeg=01;35:*.avi=01;35:*.fli=01;35:*.gl=01;35:*.dl=01;35:*.xcf=01;35:*.xwd=01;35:*.ogg=01;35:*.mp3=01;35:*.wav=01;35:'
-
-alias la="ls -AF ${colorflag}"
-alias ll="ls -lF ${colorflag}"
-alias lla="ls -lAF ${colorflag}"
-
-# List only directories
-alias lsd='ls -lF ${colorflag} | grep "^d"'
+alias la="ls -AF"
+alias ll="ls -lF"
+alias lla="ls -lAF"
+alias lsd='CLICOLOR_FORCE=true ls -lF | grep --color="never" "^d"'
 
 # Reload the shell (i.e. invoke as a login shell)
 alias reload="exec $SHELL -l"
 
-##############################################################################
-# Colors
-# https://github.com/gf3/dotfiles
-##############################################################################
 
-if [[ $COLORTERM = gnome-* && $TERM = xterm ]] && infocmp gnome-256color >/dev/null 2>&1; then
-        export TERM=gnome-256color
-elif infocmp xterm-256color >/dev/null 2>&1; then
-        export TERM=xterm-256color
-fi
-
-# if tput setaf 1 &> /dev/null; then
-#         tput sgr0
-#         if [[ $(tput colors) -ge 256 ]] 2>/dev/null; then
-#             MAGENTA=$(tput setaf 0)
-#             RED=$(tput setaf 1)
-#             GREEN=$(tput setaf 2)
-#             YELLOW=$(tput setaf 3)
-#             BLUE=$(tput setaf 4)
-#             MAGENTA=$(tput setaf 5)
-#             CYAN=$(tput setaf 6)
-#             WHITE=$(tput setaf 7)
-#             LTGRAY=$(tput setaf 8)
-#             LTRED=$(tput setaf 9)
-#             LTGREEN=$(tput setaf 10)
-#             LTYELLOW=$(tput setaf 11)
-#             LTBLUE=$(tput setaf 12)
-#             LTMAGENTA=$(tput setaf 13)
-#             LTCYAN=$(tput setaf 14)
-#             WHITE=$(tput setaf 15)
-#             DKGRAY=$(tput setaf 16)
-
-#             ORANGE=$(tput setaf 172)
-# 	    	PURPLE=$(tput setaf 141)
-#         else
-#                 PURPLE=$(tput setaf 1)
-#                 GREEN=$(tput setaf 2)
-#                 YELLOW=$(tput setaf 3)
-#                 ORANGE=$(tput setaf 4)
-#                 MAGENTA=$(tput setaf 5)
-#                 CYAN=$(tput setaf 6)
-#                 WHITE=$(tput setaf 7)
-
-#         fi
-#         BOLD=$(tput bold)
-#         RESET=$(tput sgr0)
-# else
-	# http://misc.flogisoft.com/bash/tip_colors_and_formatting
-    RESET="\033[0m"
-
-    BOLD="\033[1m"
-    DIM="\033[2m"
-    UNDERLINE="\033[4m"
-    BLINK="\033[5m"
-    INVERT="\033[7m"
-    HIDDEN="\033[8m"
-
-    DEFAULT="\033[39m"
-    BLACK="\033[30m"
-    RED="\033[31m"
-    GREEN="\033[32m"
-    YELLOW="\033[33m"
-    BLUE="\033[34m"
-    MAGENTA="\033[35m"
-    CYAN="\033[36m"
-    LTGRAY="\033[37m"
-    DKGRAY="\033[90m"
-    LTRED="\033[91m"
-    LTGREEN="\033[92m"
-    LTYELLOW="\033[93m"
-    LTBLUE="\033[94m"
-    LTMAGENTA="\033[95m"
-    LTCYAN="\033[96m"
-    WHITE="\033[97m"
-
-    BGDEFAULT="\033[41m"
-    BGBLACK="\033[40m"
-    BGRED="\033[41m"
-    BGGREEN="\033[42m"
-    BGYELLOW="\033[43m"
-    BGBLUE="\033[44m"
-    BGMAGENTA="\033[45m"
-    BGCYAN="\033[46m"
-    BGLTGRAY="\033[47m"
-    BGDKGRAY="\033[100m"
-    BGLTRED="\033[101m"
-    BGLTGREEN="\033[102m"
-    BGLTYELLOW="\033[103m"
-    BGLTBLUE="\033[104m"
-    BGLTMAGENTA="\033[105m"
-    BGLTCYAN="\033[106m"
-    BGWHITE="\033[107m"
-# fi
-
-export MAGENTA
-export ORANGE
-export GREEN
-export PURPLE
-export WHITE
-export BOLD
-export RESET
-
-
-##############################################################################
-# Prompt
-##############################################################################
-
-function parse_git_dirty() {
-    [[ $(git status 2> /dev/null | tail -n1) != *"working directory clean"* ]] && echo "*"
-}
-
-function parse_git_branch() {
-    cdgit branch --no-color 2> /dev/null | sed -e '/^[^*]/d' -e "s/* \(.*\)/\1$(parse_git_dirty)/"
-}
-
-function git_info() {
-    # check if we're in a git repo
-    git rev-parse --is-inside-work-tree &>/dev/null || return
-
-    # quickest check for what branch we're on
-    branch=$(git symbolic-ref -q HEAD | sed -e 's|^refs/heads/||')
-
-    # check if it's dirty (via github.com/sindresorhus/pure)
-    dirty=$(git diff --quiet --ignore-submodules HEAD &>/dev/null; [ $? -eq 1 ] && echo -e $RED"*")
-
-    echo -e " "$GREEN$branch$dirty
-}
-
-# full path in title bar, basename in tab
-export PS1="\[\e]2;\w\a\]\[\e]1;\W\a\]\n\[${CYAN}\]\h \[$YELLOW\]\w\$(git_info)\[$DEFAULT\]\n\$ \[$RESET\]"
-export PS2="\[$ORANGE\]→ \[$RESET\]"
-export SUDO_PS1="\n\[${CYAN}\]\h \[$YELLOW\]\w\n\[$BGRED$WHITE\][\u] #\[$RESET\] "
 
 
 ##############################################################################
@@ -241,3 +112,111 @@ fi;
 
 # Add tab completion for SSH hostnames based on ~/.ssh/config, ignoring wildcards
 [ -e "$HOME/.ssh/config" ] && complete -o "default" -o "nospace" -W "$(grep "^Host" ~/.ssh/config | grep -v "[?*]" | cut -d " " -f2)" scp sftp ssh
+
+
+
+
+##############################################################################
+# Solarized colors - http://git.io/solarized-colors.
+##############################################################################
+
+if [[ $COLORTERM = gnome-* && $TERM = xterm ]] && infocmp gnome-256color >/dev/null 2>&1; then
+    export TERM=gnome-256color
+elif infocmp xterm-256color >/dev/null 2>&1; then
+    export TERM=xterm-256color
+fi
+
+if tput setaf 1 &> /dev/null; then
+    tput sgr0;
+    bold=$(tput bold)
+    reset=$(tput sgr0)
+    base03=$(tput setaf 234)
+    base02=$(tput setaf 235)
+    base01=$(tput setaf 240)
+    base00=$(tput setaf 241)
+    base0=$(tput setaf 244)
+    base1=$(tput setaf 245)
+    base2=$(tput setaf 254)
+    base3=$(tput setaf 230)
+    yellow=$(tput setaf 136)
+    orange=$(tput setaf 166)
+    red=$(tput setaf 124)
+    magenta=$(tput setaf 125)
+    violet=$(tput setaf 61)
+    blue=$(tput setaf 33)
+    cyan=$(tput setaf 37)
+    green=$(tput setaf 64)
+else
+    bold="\033[1m"
+    reset="\033[0m"
+    base03="\033[90m"
+    base02="\033[30m"
+    base01="\033[92m"
+    base00="\033[93m"
+    base0="\033[94m"
+    base1="\033[96m"
+    base2="\033[37m"
+    base3="\033[97m"
+    yellow="\033[33m"
+    orange="\033[91m"
+    red="\033[31m"
+    magenta="\033[35m"
+    violet="\033[95m"
+    blue="\033[34m"
+    cyan="\033[36m"
+    green="\033[32m"
+fi
+
+
+
+
+##############################################################################
+# Prompt
+##############################################################################
+
+# import git prompt if not already sourced by bash completiong above
+if [ -z $(type -t __git_ps1) ]; then
+    if which brew > /dev/null && [ -f "$(brew --prefix)/etc/bash_completion.d/git-prompt.sh" ]; then
+        source $(brew --prefix)/etc/bash_completion.d/git-prompt.sh
+    elif [ -f /usr/lib/git-core/git-sh-prompt ]; then
+        source /usr/lib/git-core/git-sh-prompt
+    fi
+fi
+
+GIT_PS1_SHOWDIRTYSTATE=true
+GIT_PS1_SHOWSTASHSTATE=true
+GIT_PS1_SHOWUNTRACKEDFILES=true
+GIT_PS1_SHOWUPSTREAM="auto"
+GIT_PS1_STATESEPARATOR=" $magenta"
+
+# Tweak standard __git_ps1 output:
+# - ensure space before upstream markers and color them
+# - remove = upstream marker
+# - replace markers
+git_info() {
+    __git_ps1 "%s" \
+    | sed -e "s/\([<>]*\)$/ $yellow\1/" \
+    | tr -d "=" \
+    | tr "*%<>" "!?⇣⇡"
+}
+
+PS1="\[\033]2;\w\007\]"                     # window title to full working directory
+PS1+="\[\033]1;\W\007\]"                    # tab title to short working directory
+PS1+="\n"                                   # first line (info)
+[[ "$SSH_TTY" ]] && PS1+="\[$orange\]\h "   #   only show host if connected via ssh
+PS1+="\[$blue\]\w "                         #   working directory
+PS1+="$green\$(git_info)"                   #   git branch / status
+PS1+="\n"                                   # second line (prompt)
+[[ $EUID == 0 ]] && PS1+="\[$red\]\u "      #   only show user if root
+PS1+="\[$reset\]\\$ "                       # "smart" prompt char ($ or #)
+export PS1
+export PS2="→ "
+
+
+
+
+##############################################################################
+# Cleanup
+##############################################################################
+unset path_append path_prepend path_remove
+

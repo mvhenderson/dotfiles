@@ -18,7 +18,7 @@ brew cleanup
 
 # npm update npm -g
 printf "\n\nUpdating node modules...\n"
-npm update -g
+npm update --global --depth=0
 
 printf "\n\Updating gem system...\n"
 sudo gem update --system

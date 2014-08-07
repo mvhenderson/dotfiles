@@ -1,0 +1,22 @@
+#!/usr/bin/env bash
+
+check_package_manager() {
+    case $os in
+        osx*) check_brew ;;
+        *) ;; #todo
+    esac
+}
+
+check_build_tools() {
+    case $os in
+        osx*) check_xcode ;;
+        *) ;; #todo
+    esac
+}
+
+run_packages() {
+    case $os in
+        osx*) run_brew ;;
+        *) ;; #todo
+    esac
+}

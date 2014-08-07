@@ -21,21 +21,21 @@ run_packages() {
     esac
 }
 
-check_sudo() {
-    local need_sudo=false
-    case $io in
-        osx)
-            [[ ! is_xcode_installed || ! is_brew_installed ]] || need_sudo=true
-            ;;
-        *) ;; #todo
-    esac
+setup_sudo() {
+    local need_sudo=${1:-false}
+    if [[ ! need_sudo ]]; then
+        case $io in
+            osx)
+                [[ ! is_xcode_installed || ! is_brew_installed ]] || need_sudo=true
+                ;;
+            *) ;; #todo
+        esac
+    fi
 
     # Ask for the administrator password upfront and keep-alive until finished
     # NOTE: installing homebrew will invalidate the keep-alive :(
     if $need_sudo; then
-        log_info "This system requires sudo for some operations"
-        sudo -k # invalidate any existing sudo
-        sudo -v # prompt for password
+        sudo -v -p "This script requires sudo for some operations. Password:"
         while true; do sudo -n true; sleep 60; kill -0 "$$" || exit; done 2>/dev/null &
     fi
 }
@@ -56,10 +56,6 @@ setup_os() {
     case $OSTYPE in
         darwin*)
             os="osx"
-            if [ $(compare_versions "$(sw_vers -productVersion)" "10.9") == '<' ]; then
-                log_error "OS X 10.9.0+ required"
-                return 1
-            fi
             ;;
         linux*)
             os="linux"

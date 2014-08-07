@@ -74,7 +74,7 @@ done
 setup_os
 
 # Ask for sudo, if needed, and keep alive
-check_sudo
+setup_sudo
 
 # Pull name/email from gitconfig otherwise prompt
 if have_gitconfig; then

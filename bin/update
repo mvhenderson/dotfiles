@@ -1,0 +1,27 @@
+#!/usr/bin/env bash
+
+source "${DOTFILES_DIR}/lib/sys"
+
+setup_os
+setup_sudo true
+
+sudo softwareupdate -i -a
+
+printf "\n\nUpdating Homebrew...\n"
+brew update
+
+printf "\n\nUpgrading formulae...\n"
+brew upgrade
+
+printf "\n\nCleaning old formulae...\n"
+brew cleanup
+
+# npm update npm -g
+printf "\n\nUpdating node modules...\n"
+npm update -g
+
+printf "\n\Updating gem system...\n"
+sudo gem update --system
+
+printf "\n\Updating gems...\n"
+sudo gem update

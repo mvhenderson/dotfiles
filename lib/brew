@@ -24,7 +24,6 @@ check_brew() {
     if type_exists 'brew'; then
         log_success "Homebrew found"
     else
-        # no redirect here since homebrew will ask for sudu
         log_info "Installing Homebrew..."
         $dry_run ruby -e "$(curl -fsSL https://raw.github.com/Homebrew/homebrew/go/install)" \
             && log_success "Homebrew installed" \

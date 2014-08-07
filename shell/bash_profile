@@ -1,6 +1,8 @@
 #!/usr/bin/env bash
 [ -n "$PS1" ] || return
 
+export DOTFILES_DIR="${HOME}/.dotfiles"
+
 ##############################################################################
 # Environment options
 ##############################################################################
@@ -11,7 +13,7 @@ path_prepend () { path_remove $1; [[ -d "$1" ]] && export PATH="$1:$PATH"; }
 path_remove ()  { export PATH=`echo -n $PATH | awk -v RS=: -v ORS=: '$0 != "'$1'"' | sed 's/:$//'`; }
 
 path_prepend "/usr/local/bin"
-path_append "${HOME}/.dotfiles/bin"
+path_append "${DOTFILES_DIR}/bin"
 path_append "/usr/texbin"
 
 # Make vim the default editor
@@ -120,7 +122,7 @@ fi;
 # Prompt
 ##############################################################################
 
-source ~/.dotfiles/lib/colors
+source "${DOTFILES_DIR}/lib/colors"
 
 # import git prompt if not already sourced by bash completiong above
 if [ -z $(type -t __git_ps1) ]; then

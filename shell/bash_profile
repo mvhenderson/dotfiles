@@ -117,62 +117,10 @@ fi;
 
 
 ##############################################################################
-# Solarized colors - http://git.io/solarized-colors.
-##############################################################################
-
-if [[ $COLORTERM = gnome-* && $TERM = xterm ]] && infocmp gnome-256color >/dev/null 2>&1; then
-    export TERM=gnome-256color
-elif infocmp xterm-256color >/dev/null 2>&1; then
-    export TERM=xterm-256color
-fi
-
-if tput setaf 1 &> /dev/null; then
-    tput sgr0;
-    bold=$(tput bold)
-    reset=$(tput sgr0)
-    base03=$(tput setaf 234)
-    base02=$(tput setaf 235)
-    base01=$(tput setaf 240)
-    base00=$(tput setaf 241)
-    base0=$(tput setaf 244)
-    base1=$(tput setaf 245)
-    base2=$(tput setaf 254)
-    base3=$(tput setaf 230)
-    yellow=$(tput setaf 136)
-    orange=$(tput setaf 166)
-    red=$(tput setaf 124)
-    magenta=$(tput setaf 125)
-    violet=$(tput setaf 61)
-    blue=$(tput setaf 33)
-    cyan=$(tput setaf 37)
-    green=$(tput setaf 64)
-else
-    bold="\033[1m"
-    reset="\033[0m"
-    base03="\033[90m"
-    base02="\033[30m"
-    base01="\033[92m"
-    base00="\033[93m"
-    base0="\033[94m"
-    base1="\033[96m"
-    base2="\033[37m"
-    base3="\033[97m"
-    yellow="\033[33m"
-    orange="\033[91m"
-    red="\033[31m"
-    magenta="\033[35m"
-    violet="\033[95m"
-    blue="\033[34m"
-    cyan="\033[36m"
-    green="\033[32m"
-fi
-
-
-
-
-##############################################################################
 # Prompt
 ##############################################################################
+
+source ~/.dotfiles/lib/colors
 
 # import git prompt if not already sourced by bash completiong above
 if [ -z $(type -t __git_ps1) ]; then

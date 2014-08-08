@@ -20,8 +20,8 @@ brew cleanup
 printf "\n\nUpdating node modules...\n"
 npm update --global --depth=0
 
-printf "\n\Updating gem system...\n"
-sudo gem update --system
+# printf "\n\Updating gem system...\n"
+# sudo gem update --system
 
-printf "\n\Updating gems...\n"
-sudo gem update
+# printf "\n\Updating gems...\n"
+# sudo gem update

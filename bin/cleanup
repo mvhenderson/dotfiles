@@ -1,0 +1,92 @@
+#!/usr/bin/env bash
+show_help() {
+cat <<EOT
+cleanup - Mike Henderson - https://github.com/mvhenderson/dotfiles/
+
+Perform cleanup operations
+
+Usage: $(basename "$0") [options]
+
+Options:
+    npm             clear the npm cache
+    brew            clear brew downloads
+    cask            clear cask downloads
+    trash           empty trash
+    logs            delete system logs
+    ds              recurively delete .DS_Store files
+    all             clean all of the above
+
+    --dry-run       Runs the cleaner(s) without making any changes
+    -h, --help      Print this help text
+
+Copyright (c) 2014 Mike Henderson. Licensed under the MIT license.
+EOT
+}
+
+source "${DOTFILES_DIR}/lib/sys"
+source "${DOTFILES_DIR}/lib/io"
+source "${DOTFILES_DIR}/lib/colors"
+setup_os
+
+declare -A cleaners=(
+    [npm]=false
+    [brew]=false
+    [cask]=false
+    [trash]=false
+    [logs]=false
+    [ds]=false
+)
+
+dry_run=;
+for opt in $@; do
+    case $opt in
+        npm)        cleaners[$opt]=true ;;
+        brew)       cleaners[$opt]=true ;;
+        cask)       cleaners[$opt]=true ;;
+        ds)         cleaners[$opt]=true ;;
+        trash)
+            cleaners[$opt]=true
+            setup_sudo true
+            ;;
+        logs)
+            cleaners[$opt]=true
+            setup_sudo true
+            ;;
+        all)
+            for cleaner in "${!cleaners[@]}"; do cleaners[$cleaner]=true; done
+            setup_sudo true
+            ;;
+        --dry-run)  dry_run=log_dryrun ;;
+        -h|--help)  show_help          ;;
+        -*|--*) log_warning "Warning: invalid option $opt" ;;
+    esac
+done
+
+for cleaner in "${!cleaners[@]}"; do
+    if ${cleaners[$cleaner]}; then
+        case $cleaner in
+            npm)
+                $dry_run npm cache clean
+                ;;
+            brew)
+                $dry_run brew cleanup
+                ;;
+            cask)
+                $dry_run brew cask cleanup
+                ;;
+            trash)
+                $dry_run sudo rm -rfv /Volumes/*/.Trashes
+                $dry_run sudo rm -rfv ~/.Trash
+                ;;
+            logs)
+                $dry_run sudo rm -rfv /private/var/log/asl/*.asl
+                ;;
+            ds)
+                $dry_run find . -type f -name '*.DS_Store' -ls -delete
+                ;;
+        esac
+    fi
+done
+
+
+unset dry_run cleaners show_help

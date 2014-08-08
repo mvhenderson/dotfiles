@@ -13,11 +13,11 @@ brew update
 printf "\n\nUpgrading formulae...\n"
 brew upgrade
 
-printf "\n\nCleaning old formulae...\n"
-brew cleanup
+# printf "\n\nCleaning old formulae...\n"
+# brew cleanup
 
-# npm update npm -g
 printf "\n\nUpdating node modules...\n"
+# npm update npm -g
 npm update --global --depth=0
 
 # printf "\n\Updating gem system...\n"

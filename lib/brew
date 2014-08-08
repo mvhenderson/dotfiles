@@ -21,8 +21,10 @@ declare -a brew_formulae=(
 )
 
 declare -a brew_casks=(
+    'alfred'
     'cert-quicklook'
     'colorpicker-developer'
+    'dash'
     'day-o'
     'iterm2'
     'qlcolorcode'

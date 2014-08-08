@@ -10,7 +10,7 @@ Restart or run `qlmanage -r` so finder picks up the QuickLook plugins installed 
 
 Launch Alfred, answer prompts, then `brew cask alfred link`
 
-Make sure Dash starts at login.
+Make sure Dash starts at login. Setup user to hide window.
 
 Credits
 =======

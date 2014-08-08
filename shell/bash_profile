@@ -38,6 +38,14 @@ shopt -s nocaseglob
 # Autocorrect typos in path names when using `cd`
 shopt -s cdspell
 
+# Bash 4 recursive cd, e.g. `**/qux` will enter `./foo/bar/baz/qux`
+shopt -s autocd 2> /dev/null;
+
+# Bash 4 recursive globbing, e.g. `echo **/*.txt`
+shopt -s globstar 2> /dev/null;
+
+# Raise limit for open files and processes
+ulimit -S -n 1024
 
 
 
@@ -77,21 +85,107 @@ alias .....="cd ../../../.."
 alias -- -="cd -"
 
 # Shortcuts
-alias db="cd ~/Dropbox"
-alias dl="cd ~/Downloads"
-alias dt="cd ~/Desktop"
 alias s="cd ~/Source"
 alias g="git"
-alias h="history"
 
-# ls
 # Detect which `ls` flavor is in use
 if ls --color > /dev/null 2>&1; then # GNU `ls`
     alias ls="command ls --color"
 else # OS X `ls`
     alias ls="command ls -G"
 fi
-# TODO export LS_COLORS='no=00:fi=00:di=01;34:ln=01;36:pi=40;33:so=01;35:do=01;35:bd=40;33;01:cd=40;33;01:or=40;31;01:ex=01;32:*.tar=01;31:*.tgz=01;31:*.arj=01;31:*.taz=01;31:*.lzh=01;31:*.zip=01;31:*.z=01;31:*.Z=01;31:*.gz=01;31:*.bz2=01;31:*.deb=01;31:*.rpm=01;31:*.jar=01;31:*.jpg=01;35:*.jpeg=01;35:*.gif=01;35:*.bmp=01;35:*.pbm=01;35:*.pgm=01;35:*.ppm=01;35:*.tga=01;35:*.xbm=01;35:*.xpm=01;35:*.tif=01;35:*.tiff=01;35:*.png=01;35:*.mov=01;35:*.mpg=01;35:*.mpeg=01;35:*.avi=01;35:*.fli=01;35:*.gl=01;35:*.dl=01;35:*.xcf=01;35:*.xwd=01;35:*.ogg=01;35:*.mp3=01;35:*.wav=01;35:'
+
+# ls color map for OS X and GNU ls
+function set_ls_colors() {
+
+    # man ls | grep "LSCOLORS" -- OS X
+    local -a osx=(
+        'ex'  # blue - directory
+        'gx'  # cyan - symbolic link
+        'fx'  # magenta - socket
+        'fx'  # magenta - pipe
+        'cx'  # green - executable
+        'fx'  # magenta - block special
+        'fx '  # magenta - character special
+        'cx'  # green - executable with setuid bit set
+        'cx'  # green - executable with setgid bit set
+        'ex'  # blue - directory writable to others, with sticky bit
+        'ex'  # blue - directory writable to others, without sticky bit
+    )
+    local a="${osx[*]}"
+    export LSCOLORS="${a// /}"
+
+    # http://www.bigsoft.co.uk/blog/index.php/2008/04/11/configuring-ls_colors
+    local -a gnu=(
+        'no=00'         # default
+        'fi=00'         # file
+
+        # directory - blue
+        'di=01;34'
+
+        # executable - green
+        'ex=01;32'
+
+        # link - cyan (similar to green since links are usually to exe)
+        'ln=01;36'
+
+        # system files - magenta
+        'pi=35'         # fifo
+        'so=35'         # socket
+        'do=35'         # door
+        'bd=35'         # block file
+        'cd=35'         # character file
+
+        # bad links - red
+        'or=31'         # orphan link
+        'mi=31'         # missing file
+
+
+        # binary files - violet
+        '*.tar=95'   # Zips
+        '*.tgz=95'   #
+        '*.arj=95'   #
+        '*.taz=95'   #
+        '*.lzh=95'   #
+        '*.zip=95'   #
+        '*.z=95'     #
+        '*.Z=95'     #
+        '*.gz=95'    #
+        '*.bz2=95'   #
+        '*.deb=95'   #
+        '*.rpm=95'   #
+        '*.jar=95'   #
+        '*.jpg=95'   # Images
+        '*.jpeg=95'  #
+        '*.gif=95'   #
+        '*.bmp=95'   #
+        '*.pbm=95'   #
+        '*.pgm=95'   #
+        '*.ppm=95'   #
+        '*.tga=95'   #
+        '*.xbm=95'   #
+        '*.xpm=95'   #
+        '*.tif=95'   #
+        '*.tiff=95'  #
+        '*.png=95'   #
+        '*.mov=95'   #
+        '*.mpg=95'   #
+        '*.mpeg=95'  #
+        '*.avi=95'   #
+        '*.fli=95'   #
+        '*.gl=95'    #
+        '*.dl=95'    #
+        '*.xcf=95'   #
+        '*.xwd=95'   #
+        '*.ogg=95'   #
+        '*.mp3=95'   #
+        '*.wav=95'   #
+    )
+    local b="${gnu[*]}"
+    export LS_COLORS="${b// /:}"
+}
+set_ls_colors
+unset set_ls_colors
 
 alias la="ls -AF"
 alias ll="ls -lF"

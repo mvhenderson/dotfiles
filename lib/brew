@@ -22,6 +22,7 @@ declare -a brew_formulae=(
 
 declare -a brew_casks=(
     'alfred'
+    'betterzipql'
     'cert-quicklook'
     'colorpicker-developer'
     'dash'
@@ -33,6 +34,7 @@ declare -a brew_casks=(
     'qlstephen'
     'quicklook-csv'
     'quicklook-json'
+    'suspicious-package'
     'webp-quicklook'
 )
 

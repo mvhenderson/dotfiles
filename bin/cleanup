@@ -12,12 +12,25 @@ Options:
     brew            clear brew downloads
     cask            clear cask downloads
     trash           empty trash
-    logs            delete system logs
-    ds              recurively delete .DS_Store files
+    logs            delete system logs (improves shell startup speed)
+    file[=pattern]  recurively delete files matching pattern, defaults to .DS_Store
+    dns             flush DNS cache
+    launch          Clean up LaunchServices to remove duplicates in the “Open With” menu
+
     all             clean all of the above
 
     --dry-run       Runs the cleaner(s) without making any changes
     -h, --help      Print this help text
+
+Examples:
+    # Dry run for all
+    $(basename "$0") --dry-run all
+
+    # Just brew and cask
+    $(basename "$0") brew cask
+
+    # All dump files under current dir
+    $(basename "$0") file=*.dump
 
 Copyright (c) 2014 Mike Henderson. Licensed under the MIT license.
 EOT
@@ -35,15 +48,23 @@ declare -A cleaners=(
     [trash]=false
     [logs]=false
     [ds]=false
+    [dns]=false
+    [launch]=false
 )
 
+pattern="*.DS_Store"
 dry_run=;
-for opt in $@; do
+for opt in $@; do  #TODO: will not support spaces in pattern for file=pattern
     case $opt in
         npm)        cleaners[$opt]=true ;;
         brew)       cleaners[$opt]=true ;;
         cask)       cleaners[$opt]=true ;;
-        ds)         cleaners[$opt]=true ;;
+        dns)        cleaners[$opt]=true ;;
+        launch)     cleaners[$opt]=true ;;
+        file*)
+            cleaners[file]=true
+            pattern="${opt#*=}"
+            ;;
         trash)
             cleaners[$opt]=true
             setup_sudo true
@@ -81,8 +102,16 @@ for cleaner in "${!cleaners[@]}"; do
             logs)
                 $dry_run sudo rm -rfv /private/var/log/asl/*.asl
                 ;;
-            ds)
-                $dry_run find . -type f -name '*.DS_Store' -ls -delete
+            file)
+                $dry_run find . -type f -name "$pattern" -ls -delete
+                ;;
+            dns)
+                $dry_run dscacheutil -flushcache \
+                && $dry_run killall -HUP mDNSResponder
+                ;;
+            launch)
+                $dry_run /System/Library/Frameworks/CoreServices.framework/Frameworks/LaunchServices.framework/Support/lsregister -kill -r -domain local -domain system -domain user \
+                && $dry_run killall Finder
                 ;;
         esac
     fi

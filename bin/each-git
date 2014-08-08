@@ -1,0 +1,15 @@
+#!/bin/bash
+
+# credit:@necolas
+
+# Runs `git` command on every directory within the current directory
+
+# `find .` search the current directory
+# `! -path .` but don't include current directory
+# `-type d` find only directories, not files
+# `-print` print the directory name
+# `-maxdepth 1` limit the depth to one sub-directory
+# `-execdir {} \;` run a custom command for every directory found
+# `git --git-dir={}/.git --work-tree=$PWD/{} <COMMAND>` git command in each directory
+
+find . ! -path . -type d -print -maxdepth 1 -execdir git --git-dir={}/.git --work-tree=$PWD/{} $@ \;

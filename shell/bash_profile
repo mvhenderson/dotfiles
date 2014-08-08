@@ -202,7 +202,7 @@ unset set_ls_colors
 alias la="ls -AF"     # all
 alias ll="ls -lF"     # long
 alias lla="ls -lAF"   # all, long
-alias lsd='ls -d */'  # dir only
+alias lsd="ls -d */"  # dir only
 alias l="ls -ogF"     # long, no user, no group
 alias lt="ls -toF"    # by last modified, long, no user, no group
 alias lz="ls -lrSog"  # by size, lon, no user, no group
@@ -243,7 +243,7 @@ alias speedtest="wget -O /dev/null http://speedtest.wdc01.softlayer.com/download
 ##############################################################################
 
 # Create a new directory and enter it
-mk() { mkdir -p "$@" && cd "$@" }
+mk() { mkdir -p "$@" && cd "$@"; }
 
 # Fuzzy find file/dir - credit:@webpro
 ff()  { find . -type f -name "${1}";  }
@@ -406,4 +406,3 @@ export PS2="→ "
 # Cleanup
 ##############################################################################
 unset path_append path_prepend path_remove
-

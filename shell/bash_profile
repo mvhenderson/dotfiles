@@ -83,6 +83,7 @@ alias ...="cd ../.."
 alias ....="cd ../../.."
 alias .....="cd ../../../.."
 alias -- -="cd -"
+alias bd=". bd -s"
 
 # Shortcuts
 alias s="cd ~/Source"
@@ -187,14 +188,39 @@ function set_ls_colors() {
 set_ls_colors
 unset set_ls_colors
 
-alias la="ls -AF"
-alias ll="ls -lF"
-alias lla="ls -lAF"
-alias lsd='CLICOLOR_FORCE=true ls -lF | grep --color="never" "^d"'
+alias la="ls -AF"     # all
+alias ll="ls -lF"     # long
+alias lla="ls -lAF"   # all, long
+alias lsd='ls -d */'  # dir only
 
 # Reload the shell (i.e. invoke as a login shell)
 alias reload="exec $SHELL -l"
 
+## IP addresses
+alias ip="dig +short myip.opendns.com @resolver1.opendns.com"
+alias ipl="ipconfig getifaddr en0"
+
+## Request using GET, POST, etc. method
+for method in GET HEAD POST PUT DELETE TRACE OPTIONS; do
+    alias "$method"="lwp-request -m '$method'"
+done
+
+## Speed Test
+alias speedtest="wget -O /dev/null http://speedtest.wdc01.softlayer.com/downloads/test10.zip"
+
+# Clean/kill stuff
+
+## Flush DNS
+alias flushdns="dscacheutil -flushcache && killall -HUP mDNSResponder"
+
+## Clean up LaunchServices to remove duplicates in the “Open With” menu
+alias lscleanup="/System/Library/Frameworks/CoreServices.framework/Frameworks/LaunchServices.framework/Support/lsregister -kill -r -domain local -domain system -domain user && killall Finder"
+
+## Empty trash on mounted volumes and main HDD, and clear system logs
+alias emptytrash="sudo rm -rfv /Volumes/*/.Trashes; sudo rm -rfv ~/.Trash; sudo rm -rfv /private/var/log/asl/*.asl"
+
+## Recursively remove .DS_Store files
+alias cleanupds="find . -type f -name '*.DS_Store' -ls -delete"
 
 
 
@@ -212,7 +238,8 @@ fi;
 # Add tab completion for SSH hostnames based on ~/.ssh/config, ignoring wildcards
 [ -e "$HOME/.ssh/config" ] && complete -o "default" -o "nospace" -W "$(grep "^Host" ~/.ssh/config | grep -v "[?*]" | cut -d " " -f2)" scp sftp ssh
 
-
+# Grunt
+type -P grunt &>/dev/null && eval "$(grunt --completion=bash)"
 
 
 ##############################################################################

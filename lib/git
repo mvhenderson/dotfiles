@@ -132,6 +132,11 @@ prompt_gitconfig() {
 }
 
 write_gitconfig() {
+    if ! is_gitconfig_changed; then
+        log_neutral "Gitconfig unchanged"
+        return
+    fi
+
     [[ -e "${HOME}/.gitconfig" ]] && $dry_run mv -f "${HOME}/.gitconfig" "${HOME}/.gitconfig.bak"
 
     local src="./conf/git/gitconfig-${distro}"
@@ -145,6 +150,8 @@ write_gitconfig() {
 }
 
 is_gitconfig_changed() {
+    have_gitconfig || return 0
+
     local src="./conf/git/gitconfig-${distro}"
     [[ -e "$src" ]] || src="./conf/git/gitconfig-$os"
 

@@ -16,7 +16,40 @@ check_build_tools() {
 
 run_packages() {
     case $os in
-        osx*) run_brew ;;
+        osx*)
+            run_brew
+            run_cask
+            ;;
         *) ;; #todo
     esac
+}
+
+configure_shell() {
+    case $os in
+        osx*)
+            # Use bash 4 on OS X (via brew)
+            if is_bash4; then
+                log_neutral "Already using Bash 4"
+            else
+                log_step "Configuring Bash 4"
+                grep "/usr/local/bin/bash" /private/etc/shells &>/dev/null \
+                || $dry_run sudo bash -c "echo /usr/local/bin/bash >> /private/etc/shells"
+
+                $dry_run chsh -s /usr/local/bin/bash \
+                && log_success "Changed shell to Bash 4" \
+                || log_warning "Failed to change shell to Bash 4"
+            fi
+            ;;
+        *) ;; #todo
+    esac
+}
+
+is_bash4() {
+    case $os in
+        osx*)
+            [[ "$SHELL" == "/bin/bash" ]] && return 1
+            ;;
+        *) ;; #todo
+    esac
+    return 0
 }

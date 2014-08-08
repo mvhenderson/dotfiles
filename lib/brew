@@ -20,6 +20,24 @@ declare -a brew_formulae=(
     'homebrew/dupes/rsync'
 )
 
+declare -a brew_casks=(
+    'cert-quicklook'
+    'colorpicker-developer'
+    'day-o'
+    'iterm2'
+    'qlcolorcode'
+    'qlmarkdown'
+    'qlprettypatch'
+    'qlstephen'
+    'quicklook-csv'
+    'quicklook-json'
+    'webp-quicklook'
+)
+
+is_brew_installed() {
+    type_exists 'brew'
+}
+
 check_brew() {
     if type_exists 'brew'; then
         log_success "Homebrew found"
@@ -87,9 +105,36 @@ run_brew() {
         || log_warning "Failed to clean formulae"
 }
 
+run_cask() {
+    type_exists 'brew' || log_fatal "Homebrew not found"
+
+    log_info "Installing casks..."
+    for index in ${!brew_casks[*]}
+    do
+        if cask_exists ${brew_casks[$index]}; then
+            log_neutral "${brew_casks[$index]}"
+        else
+            log_step "Brewing ${brew_casks[$index]}..."
+            $dry_run brew cask install "${brew_casks[$index]}" \
+                && log_success "${brew_casks[$index]}" \
+                || log_error "${brew_casks[$index]}"
+        fi
+    done
+
+    log_info "Cleaning outdated casks..."
+    $dry_run brew cask cleanup \
+        && log_success "Casks cleaned" \
+        || log_warning "Failed to clean casks"
+}
+
 # Test whether a Homebrew formula is already installed
 # $1 - formula name (may include options)
 formula_exists() {
     [[ -n $(brew list $1) ]] || return 1
+    return 0
+}
+
+cask_exists() {
+    brew cask list $1 &>/dev/null || return 1
     return 0
 }

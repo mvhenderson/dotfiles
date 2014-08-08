@@ -105,7 +105,8 @@ run_npm
 log_header "Link"
 run_link
 
-log_header "Copy"
+log_header "Misc"
 write_gitconfig
+configure_shell
 
 log_summary

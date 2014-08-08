@@ -4,6 +4,7 @@ declare -a brew_taps=(
     'caskroom/cask'
     'homebrew/dupes'
     'homebrew/versions'
+    'caskroom/versions'
 )
 
 declare -a brew_formulae=(

@@ -665,7 +665,7 @@ PS1+="\n"                                   # second line (prompt)
 [[ $EUID == 0 ]] && PS1+="\[$red\]\u "      #   only show user if root
 PS1+="\[$reset\]\\$ "                       # "smart" prompt char ($ or #)
 export PS1
-export PS2="\[${yellow}\→ \[${reset}\]";
+export PS2="\[${yellow}\]→ \[${reset}\]";
 
 
 

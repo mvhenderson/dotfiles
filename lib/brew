@@ -18,6 +18,7 @@ declare -a brew_formulae=(
     'wget'
     'jq'
     'openssl'
+    'wdiff'
     'brew-cask'
     'homebrew/dupes/rsync'
 )

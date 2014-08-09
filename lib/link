@@ -4,8 +4,10 @@ run_link() {
     link "shell/bashrc"       ".bashrc"
     link "shell/bash_profile" ".bash_profile"
     link "shell/inputrc"      ".inputrc"
+    link "shell/screenrc"     ".screenrc"
 
     link "conf/curlrc"        ".curlrc"
+    link "conf/wgetrc"        ".wgetrc"
     link "conf/editorconfig"  ".editorconfig"
     link "conf/git/gitignore" ".gitignore"
     link "conf/vim/vimrc"     ".vimrc"

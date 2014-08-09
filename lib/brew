@@ -12,6 +12,7 @@ declare -a brew_formulae=(
     'git'
     'bash'
     'bash-completion'
+    'man2html'
     'node'
     'tree'
     'wget'

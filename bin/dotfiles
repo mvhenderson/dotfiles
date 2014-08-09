@@ -110,3 +110,6 @@ write_gitconfig
 configure_shell
 
 log_summary
+
+# restart
+exec $SHELL -l

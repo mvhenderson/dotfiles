@@ -45,3 +45,6 @@ set convert-meta off
 
 # Use Alt/Meta + Delete to delete the preceding word
 "\e[3;3~": kill-word
+
+
+set blink-matching-paren on

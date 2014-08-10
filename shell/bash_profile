@@ -65,6 +65,8 @@ type -P brew &>/dev/null && export PHANTOMJS_BIN="$(brew --prefix)/bin/phantomjs
 # Save all lines of a multiple-line command in the same history entry
 shopt -s cmdhist
 
+# Do not autocomplete on an empty line
+shopt -s no_empty_cmd_completion;
 
 
 ##############################################################################
@@ -298,6 +300,19 @@ alias eachdir=". eachdir"
 
 # Restart Apache on OS X
 alias ra="sudo apachectl restart"
+
+# Clipboard aliases Cygwin, Linux and OS X.
+# Credit: @janmoesen
+if command -v pbpaste >/dev/null; then
+    alias getclip='pbpaste';
+    alias putclip='pbcopy';
+elif command -v xclip >/dev/null; then
+    alias getclip='xclip --out';
+    alias putclip='xclip --in';
+fi;
+
+
+
 
 ##############################################################################
 # Functions
@@ -616,7 +631,141 @@ qt() {
     #     └─ ignore case
 }
 
+# Move the given file(s) to the Trash.
+# Credit: @janmoesen
+# TODO: heredoc is not working with leading spaces in subl syntax highlighting
+# function trash {
+#     local path;
+#     for path; do
+#         # Make relative paths "absolutey".
+#         [ "${path:0:1}" = '/' ] || path="$PWD/$1";
 
+#         # Execute the AppleScript to nudge Finder.
+#         echo "$(cat <<-EOD
+#             tell application "Finder"
+#                 delete POSIX file "${path//\"/\"}"
+#             end
+#         EOD)" | osascript;
+#     done;
+# }
+
+# Show the given file(s) in the Finder.
+# Credit: @janmoesen
+function show {
+    # Default to the current directory.
+    [ $# -eq 0 ] && set -- .;
+
+    # Build the array of paths for AppleScript.
+    local path paths=();
+    for path; do
+        # Make sure each path exists.
+        if ! [ -e "$path" ]; then
+            echo "show: $path: No such file or directory";
+            continue;
+        fi;
+
+        # Crappily re-implement "readlink -f" ("realpath") for Darwin.
+        # (The "cd ... > /dev/null" hides CDPATH noise.)
+        [ -d "$path" ] \
+            && path="$(cd "$path" > /dev/null && pwd)" \
+            || path="$(cd "$(dirname "$path")" > /dev/null && \
+                       echo "$PWD/$(basename "$path")")";
+
+        # Use the "POSIX file" AppleScript syntax.
+        paths+=("POSIX file \"${path//\"/\"}\"");
+    done;
+    [ "${#paths[@]}" -eq 0 ] && return;
+
+    # Group all output to pipe through osacript.
+    {
+        echo 'tell application "Finder"';
+        echo -n 'select {'; # "reveal" would select only the last file.
+
+        for ((i = 0; i < ${#paths[@]}; i++)); do
+            echo -n "${paths[$i]}";
+            [ $i -lt $(($# - 1)) ] && echo -n ', '; # Ugly array.join()...
+        done;
+
+        echo '}';
+        echo 'activate';
+        echo 'end tell';
+    } | osascript;
+}
+
+# Sort the "du" output and use human-readable units.
+# Credit: @janmoesen
+function duh {
+    du -sk "$@" | sort -n | while read size fname; do
+        for unit in KiB MiB GiB TiB PiB EiB ZiB YiB; do
+            if [ "$size" -lt 1024 ]; then
+                echo -e "${size} ${unit}\t${fname}";
+                break;
+            fi;
+            size=$((size/1024));
+        done;
+    done;
+}
+
+# Compare one or more URLs "before" and "after".
+# Credit: @janmoesen
+function diff-url () {(
+    cd /tmp || return $?;
+    local urls=() before=() after=();
+
+    # Remember all URLs.
+    local url;
+    for url; do
+        urls+=("$url");
+    done;
+
+    # Save all URLs to "before and after".
+    local curr;
+    for curr in {before,after}; do
+        read -p "Press Enter to save $curr...";
+
+        local i;
+        for ((i = 0; i < ${#urls[@]}; i++)); do
+            url="${urls[$i]}";
+            num="$(printf '%02d' "$i")";
+            file="$curr-$num.html";
+            [ "$curr" = 'before' ] \
+                && before+=("$file") \
+                || after+=("$file");
+            wget -qO- "$url" | sed 's/m=[0-9]*//g; s/[0-9a-f]\{32\}//g; s/[0-9]* keer bekeken//' > "$file";
+            [ -z "$prev_x" ] && prev_x="$x";
+        done;
+    done;
+
+    # Loop through all URLs to diff their before and after.
+    for ((i = 0; i < ${#urls[@]}; i++)); do
+        url="${urls[$i]}";
+        num="$(printf '%02d' "$i")";
+        before="${before[$i]}";
+        after="${after[$i]}";
+        udiff --label="$url (before)" --label="$url (after)" "$before" "$after";
+        rm -f "$before" "$after";
+    done | colordiff | less -XFIRd;
+)}
+
+# Convert the parameters or STDIN to lowercase.
+# Credit: @janmoesen
+function lc {
+    if [ $# -eq 0 ]; then
+        tr '[:upper:]' '[:lower:]';
+    else
+        tr '[:upper:]' '[:lower:]' <<< "$@";
+    fi;
+}
+
+# Convert the parameters or STDIN to uppercase.
+# Credit: @janmoesen
+function uc {
+    if [ $# -eq 0 ]; then
+        tr '[:lower:]' '[:upper:]';
+    else
+        tr '[:lower:]' '[:upper:]' <<< "$@";
+    fi;
+}
 
 ##############################################################################
 # Completion
@@ -676,14 +825,19 @@ git_info() {
     | tr "*%<>" "!?⇣⇡"
 }
 
-PS1="\[\033]2;\w\007\]"                     # window title to full working directory
-PS1+="\[\033]1;\W\007\]"                    # tab title to short working directory
-PS1+="\n"                                   # first line (info)
-[[ "$SSH_TTY" ]] && PS1+="\[$orange\]\h "   #   only show host if connected via ssh
-PS1+="\[$blue\]\w "                         #   working directory
-PS1+="$green\$(git_info)"                   #   git branch / status
-PS1+="\n"                                   # second line (prompt)
-[[ $EUID == 0 ]] && PS1+="\[$red\]\u "      #   only show user if root
+PS1="\n"                                    # Ensure blank line before prompt
+if [[ -n "$SSH_TTY" ]]; then
+    PS1+="\[\033]2;\h:\w\007\]"             # window = host:full path
+    PS1+="\[\033]1;\h:\W\007\]"             # tab = host:short path
+    PS1+="\[$orange\]\h "                   # only show host if connected via ssh
+else
+    PS1+="\[\033]2;\w\007\]"                # window = full path
+    PS1+="\[\033]1;\W\007\]"                # tab title to short working directory
+fi
+PS1+="\[$blue\]\w "                         # working directory
+PS1+="\[$green\]\$(git_info)"               # git branch / status
+PS1+="\n"                                   # second line
+[[ $EUID == 0 ]] && PS1+="\[$red\]\u "      # only show user if root
 PS1+="\[$reset\]\\$ "                       # "smart" prompt char ($ or #)
 export PS1
 export PS2="\[${yellow}\]→ \[${reset}\]";

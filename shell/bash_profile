@@ -26,7 +26,8 @@ export LANG="en_US"
 export LC_ALL="en_US.UTF-8"
 
 # Highlight section titles in manual pages
-export LESS_TERMCAP_md="${yellow}";
+export LESS_TERMCAP_md="${yellow}"
+export LESS_TERMCAP_me="${reset}"
 
 # Don’t clear the screen after quitting a manual page
 export MANPAGER="less -X"
@@ -68,6 +69,7 @@ shopt -s cmdhist
 # Do not autocomplete on an empty line
 shopt -s no_empty_cmd_completion;
 
+[[ -x /usr/libexec/java_home ]] && export JAVA_HOME="$(/usr/libexec/java_home)"
 
 ##############################################################################
 # History
@@ -311,6 +313,7 @@ elif command -v xclip >/dev/null; then
     alias putclip='xclip --in';
 fi;
 
+alias sha="openssl dgst -sha256 <"
 
 
 

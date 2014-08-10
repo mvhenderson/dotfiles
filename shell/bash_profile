@@ -53,6 +53,9 @@ shopt -s autocd 2> /dev/null;
 # Bash 4 recursive globbing, e.g. `echo **/*.txt`
 shopt -s globstar 2> /dev/null;
 
+# Bash 4 autocorrect fudged paths during completion
+shopt -s dirspell 2> /dev/null;
+
 # Check the window size after each command and, if necessary, update the values
 # of LINES and COLUMNS.
 shopt -s checkwinsize

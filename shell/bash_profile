@@ -5,7 +5,7 @@ export DOTFILES_DIR="${HOME}/.dotfiles"
 source "${DOTFILES_DIR}/lib/colors"
 
 ##############################################################################
-# Environment options
+# Path
 ##############################################################################
 
 # http://stackoverflow.com/questions/370047/what-is-the-most-elegant-way-to-remove-a-path-from-the-path-variable-in-bash
@@ -14,9 +14,19 @@ path_prepend () { path_remove $1; [[ -d "$1" ]] && export PATH="$1:$PATH"; }
 path_remove ()  { export PATH=`echo -n $PATH | awk -v RS=: -v ORS=: '$0 != "'$1'"' | sed 's/:$//'`; }
 
 path_prepend "/usr/local/bin"
-# path_prepend "$(brew --prefix coreutils)/libexec/gnubin"
+# path_prepend "$(brew --prefix coreutils)/libexec/gnubin" # Override OS X utils
+
 path_append "${DOTFILES_DIR}/bin"
 path_append "/usr/texbin"
+
+unset path_append path_prepend path_remove
+
+
+
+
+##############################################################################
+# Environment options
+##############################################################################
 
 # Make vim the default editor
 export EDITOR="vim"
@@ -25,21 +35,33 @@ export EDITOR="vim"
 export LANG="en_US"
 export LC_ALL="en_US.UTF-8"
 
-# Highlight section titles in manual pages
-export LESS_TERMCAP_md="${yellow}"
-export LESS_TERMCAP_me="${reset}"
+# Colorize manual pages
+# - http://unix.stackexchange.com/questions/119/colors-in-man-pages
+# - http://www.gnu.org/software/termutils/manual/termutils-2.0/html_chapter/tput_1.html
+export LESS_TERMCAP_md=$cyan                  # headers and other bold item
+export LESS_TERMCAP_me=$reset
+export LESS_TERMCAP_us="$(tput smul)$yellow"  # underline
+export LESS_TERMCAP_ue="$(tput rmul)$reset"
+export LESS_TERMCAP_so="$base2$base01"        # hightlight
+export LESS_TERMCAP_se="$(tput rmso)$reset"
 
 # Don’t clear the screen after quitting a manual page
 export MANPAGER="less -X"
 
-# Prevent less from clearing the screen while still showing colors.
-export LESS=-XR
+# Default less options (override using -+, ie: less -+F)
+export LESS=-XRFi
+       #     │││└─ insensitive search (unless pattern has caps)
+       #     ││└─ auto exit when file fits on one screen
+       #     │└─ enable color
+       #     └─ don't clear screen
 
 # Always enable colored `grep` output
 export GREP_OPTIONS="--color=auto"
 
 # Link Homebrew casks in `/Applications` rather than `~/Applications`
 export HOMEBREW_CASK_OPTS="--appdir=/Applications";
+
+[[ -x /usr/libexec/java_home ]] && export JAVA_HOME="$(/usr/libexec/java_home)"
 
 # Case-insensitive globbing (used in pathname expansion)
 shopt -s nocaseglob
@@ -60,19 +82,17 @@ shopt -s dirspell 2> /dev/null;
 # of LINES and COLUMNS.
 shopt -s checkwinsize
 
-# Raise limit for open files and processes
-ulimit -S -n 1024
-
-# Export PhantomJS bin location
-type -P brew &>/dev/null && export PHANTOMJS_BIN="$(brew --prefix)/bin/phantomjs"
-
 # Save all lines of a multiple-line command in the same history entry
 shopt -s cmdhist
 
 # Do not autocomplete on an empty line
 shopt -s no_empty_cmd_completion;
 
-[[ -x /usr/libexec/java_home ]] && export JAVA_HOME="$(/usr/libexec/java_home)"
+# Raise limit for open files and processes
+ulimit -S -n 1024
+
+
+
 
 ##############################################################################
 # History
@@ -85,7 +105,7 @@ export HISTCONTROL="ignorespace:erasedups"
 
 # Make some commands not show up in history
 # TODO: man, cd .., ll, la, lsd, which *
-export HISTIGNORE="ls:cd:cd -:pwd:exit:date:* --help:&:[fb]g"
+export HISTIGNORE="ls:ll:la:lla:cd:cd -:pwd:exit:date:* --help:&:[fb]g"
 
 # Append to the Bash history file, rather than overwriting it
 shopt -s histappend
@@ -102,7 +122,7 @@ export PROMPT_COMMAND="history -a; $PROMPT_COMMAND"
 # Aliases
 ##############################################################################
 
-# Allow aliases to be with sudo
+# Allow aliases to be used with sudo
 alias sudo="sudo "
 
 # cd
@@ -111,10 +131,9 @@ alias ...="cd ../.."
 alias ....="cd ../../.."
 alias .....="cd ../../../.."
 alias -- -="cd -"
-alias bd=". bd -s"
+alias bd=". bd"
 
 # Shortcuts
-alias s="cd ~/Source"
 alias g="git"
 
 # Detect which `ls` flavor is in use
@@ -135,7 +154,7 @@ function set_ls_colors() {
         'fx'  # magenta - pipe
         'cx'  # green - executable
         'fx'  # magenta - block special
-        'fx '  # magenta - character special
+        'fx'  # magenta - character special
         'cx'  # green - executable with setuid bit set
         'cx'  # green - executable with setgid bit set
         'ex'  # blue - directory writable to others, with sticky bit
@@ -169,46 +188,50 @@ function set_ls_colors() {
         'or=31'         # orphan link
         'mi=31'         # missing file
 
-
         # binary files - violet
+        '*.pdf=95'   # docs
+        '*.doc=95'
+        '*.docx=95'
+
         '*.tar=95'   # Zips
-        '*.tgz=95'   #
-        '*.arj=95'   #
-        '*.taz=95'   #
-        '*.lzh=95'   #
-        '*.zip=95'   #
-        '*.z=95'     #
-        '*.Z=95'     #
-        '*.gz=95'    #
-        '*.bz2=95'   #
-        '*.deb=95'   #
-        '*.rpm=95'   #
-        '*.jar=95'   #
+        '*.tgz=95'
+        '*.arj=95'
+        '*.taz=95'
+        '*.lzh=95'
+        '*.zip=95'
+        '*.z=95'
+        '*.Z=95'
+        '*.gz=95'
+        '*.bz2=95'
+        '*.deb=95'
+        '*.rpm=95'
+        '*.jar=95'
+
         '*.jpg=95'   # Images
-        '*.jpeg=95'  #
-        '*.gif=95'   #
-        '*.bmp=95'   #
-        '*.pbm=95'   #
-        '*.pgm=95'   #
-        '*.ppm=95'   #
-        '*.tga=95'   #
-        '*.xbm=95'   #
-        '*.xpm=95'   #
-        '*.tif=95'   #
-        '*.tiff=95'  #
-        '*.png=95'   #
-        '*.mov=95'   #
-        '*.mpg=95'   #
-        '*.mpeg=95'  #
-        '*.avi=95'   #
-        '*.fli=95'   #
-        '*.gl=95'    #
-        '*.dl=95'    #
-        '*.xcf=95'   #
-        '*.xwd=95'   #
-        '*.ogg=95'   #
-        '*.mp3=95'   #
-        '*.wav=95'   #
+        '*.jpeg=95'
+        '*.gif=95'
+        '*.bmp=95'
+        '*.pbm=95'
+        '*.pgm=95'
+        '*.ppm=95'
+        '*.tga=95'
+        '*.xbm=95'
+        '*.xpm=95'
+        '*.tif=95'
+        '*.tiff=95'
+        '*.png=95'
+        '*.mov=95'
+        '*.mpg=95'
+        '*.mpeg=95'
+        '*.avi=95'
+        '*.fli=95'
+        '*.gl=95'
+        '*.dl=95'
+        '*.xcf=95'
+        '*.xwd=95'
+        '*.ogg=95'
+        '*.mp3=95'
+        '*.wav=95'
     )
     local b="${gnu[*]}"
     export LS_COLORS="${b// /:}"
@@ -229,17 +252,17 @@ alias dir="tree --dirsfirst -ChFpDaL 1"
 alias reload="exec $SHELL -l"
 
 # Concatenate and print content of files (add line numbers)
-alias lines="cat -n"
+alias catn="cat -n"
 
-## IP addresses
+# IP addresses
 alias ip="dig +short myip.opendns.com @resolver1.opendns.com"
 alias ipl="ipconfig getifaddr en0"
 alias ips="ifconfig -a | grep -o 'inet6\? \(addr:\)\?\s\?\(\(\([0-9]\+\.\)\{3\}[0-9]\+\)\|[a-fA-F0-9:]\+\)' | awk '{ sub(/inet6? (addr:)? ?/, \"\"); print }'"
 
-# Copy my public key to the pasteboard
+# Copy public key to the pasteboard
 alias pubkey="more ~/.ssh/id_rsa.pub | pbcopy | printf '=> Public key copied to pasteboard.\n'"
 
-## Request using GET, POST, etc. method credit:@janmoesen
+# Request using GET, POST, etc. method
 for method in GET HEAD POST PUT DELETE TRACE OPTIONS; do
     alias "$method"="lwp-request -m '$method'"
 done
@@ -252,7 +275,7 @@ alias hide="defaults write com.apple.finder AppleShowAllFiles -bool false && kil
 alias hidedesktop="defaults write com.apple.finder CreateDesktop -bool false && killall Finder"
 alias showdesktop="defaults write com.apple.finder CreateDesktop -bool true && killall Finder"
 
-## Speed Test
+# Speed Test
 alias speedtest="wget -O /dev/null http://speedtest.wdc01.softlayer.com/downloads/test10.zip"
 
 # Stopwatch
@@ -271,10 +294,14 @@ command -v md5sum > /dev/null || alias md5sum="md5"
 # OS X has no `sha1sum`, so use `shasum` as a fallback
 command -v sha1sum > /dev/null || alias sha1sum="shasum"
 
+# compute SHA-2 digests
+alias sha256="openssl dgst -sha256 <"
+alias sha512="openssl dgst -sha512 <"
+
 # JavaScriptCore REPL
-jscbin="/System/Library/Frameworks/JavaScriptCore.framework/Versions/A/Resources/jsc";
-[ -e "${jscbin}" ] && alias jsc="${jscbin}";
-unset jscbin;
+# jscbin="/System/Library/Frameworks/JavaScriptCore.framework/Versions/A/Resources/jsc";
+# [ -e "${jscbin}" ] && alias jsc="${jscbin}";
+# unset jscbin;
 
 # URL-encode strings
 alias urlencode='python -c "import sys, urllib as ul; print ul.quote_plus(sys.argv[1]);"'
@@ -283,9 +310,8 @@ alias urlencode='python -c "import sys, urllib as ul; print ul.quote_plus(sys.ar
 # Usage: `mergepdf -o output.pdf input{1,2,3}.pdf`
 alias mergepdf='/System/Library/Automator/Combine\ PDF\ Pages.action/Contents/Resources/join.py'
 
-# Disable Spotlight
+# Toggle Spotlight
 alias spotoff="sudo mdutil -a -i off"
-# Enable Spotlight
 alias spoton="sudo mdutil -a -i on"
 
 # PlistBuddy alias, because sometimes `defaults` just doesn’t cut it
@@ -293,7 +319,7 @@ alias plistbuddy="/usr/libexec/PlistBuddy"
 
 # Ring the terminal bell, and put a badge on Terminal.app’s Dock icon
 # (useful when executing time-consuming commands)
-alias badge="tput bel"
+alias bell="tput bel"
 
 # Intuitive map function
 # For example, to list all directories that contain a certain file:
@@ -307,7 +333,6 @@ alias eachdir=". eachdir"
 alias ra="sudo apachectl restart"
 
 # Clipboard aliases Cygwin, Linux and OS X.
-# Credit: @janmoesen
 if command -v pbpaste >/dev/null; then
     alias getclip='pbpaste';
     alias putclip='pbcopy';
@@ -316,10 +341,11 @@ elif command -v xclip >/dev/null; then
     alias putclip='xclip --in';
 fi;
 
-alias sha="openssl dgst -sha256 <"
+# Disk use
+alias du1="duh -d 1"
+alias du2="duh -d 2"
+alias duf="duh -d 1 . * .[^\.]*"
 
-# beep
-alias beep='tput bel'
 
 
 ##############################################################################
@@ -335,167 +361,12 @@ fff() { find . -type f -name "*${1}*";}
 fd()  { find . -type d -name "${1}";  }
 fdf() { find . -type d -name "*${1}*";}
 
-# Show disk usage of current folder, or list with depth - credit:@webpro
-duf() {
-    du -d ${1} -c | sort -r -n | awk '{split("K M G",v); s=1; while($1>1024){$1/=1024; s++} print int($1)v[s]"\t"$2}'
-}
-
-# Open man page as PDF - credit:@webpro
-manpdf() {
-    man -t "${1}" | open -f -a /Applications/Preview.app/
-}
-
-# Show line, optionally show surrounding lines - credit:@webpro
-line() {
-    local line_number=$1
-    local lines_around=${2:-0}
-    sed -n "`expr $line_number - $lines_around`,`expr $line_number + $lines_around`p"
-}
-
-# Extract many types of compress files
-# credit: http://nparikh.org/notes/zshrc.txt
-extract() {
-    if [ -f $1 ]; then
-        case $1 in
-            *.tar.bz2)  tar -jxvf $1                        ;;
-            *.tar.gz)   tar -zxvf $1                        ;;
-            *.bz2)      bunzip2 $1                          ;;
-            *.dmg)      hdiutil mount $1                    ;;
-            *.gz)       gunzip $1                           ;;
-            *.tar)      tar -xvf $1                         ;;
-            *.tbz2)     tar -jxvf $1                        ;;
-            *.tgz)      tar -zxvf $1                        ;;
-            *.zip)      unzip $1                            ;;
-            *.ZIP)      unzip $1                            ;;
-            *.pax)      cat $1 | pax -r                     ;;
-            *.pax.Z)    uncompress $1 --stdout | pax -r     ;;
-            *.Z)        uncompress $1                       ;;
-            *)          echo "'$1' cannot be extracted/mounted via extract()" ;;
-        esac
-    else
-        echo "'$1' is not a valid file to extract"
-    fi
-}
-
-# Check if resource is served compressed - credit:@webpro
-check_compression() {
-    curl --write-out 'Size (uncompressed) = %{size_download}\n' --silent --output /dev/null $1
-    curl --header 'Accept-Encoding: gzip,deflate,compress' --write-out 'Size (compressed) =   %{size_download}\n' --silent --output /dev/null $1
-    curl --head --header 'Accept-Encoding: gzip,deflate' --silent $1 | grep -i "cache\|content\|vary\|expires"
-}
-
-# Get gzipped file size - credit:@webpro
-gz() {
-    local origsize=$(wc -c < "$1")
-    local gzipsize=$(gzip -c "$1" | wc -c)
-    local ratio=$(echo "$gzipsize * 100/ $origsize" | bc -l)
-    local saved=$(echo "($origsize - $gzipsize) * 100/ $origsize" | bc -l)
-    printf "orig: %d bytes\ngzip: %d bytes\nsave: %2.0f%% (%2.0f%%)\n" "$origsize" "$gzipsize" "$saved" "$ratio"
-}
-
-# Create a data URI from a file and copy it to the pasteboard - credit:@necolas
-datauri() {
-    local mimeType=$(file -b --mime-type "$1")
-    if [[ $mimeType == text/* ]]; then
-        mimeType="${mimeType};charset=utf-8"
-    fi
-    printf "data:${mimeType};base64,$(openssl base64 -in "$1" | tr -d '\n')" | pbcopy | printf "=> data URI copied to pasteboard.\n"
-}
-
-# Start an HTTP server from a directory, optionally specifying the port - credit:@necolas
-pyserver() {
-    # Get port (if specified)
-    local port="${1:-8000}"
-
-    # Open in the browser
-    open "http://localhost:${port}/"
-
-    # Redefining the default content-type to text/plain instead of the default
-    # application/octet-stream allows "unknown" files to be viewable in-browser
-    # as text instead of being downloaded.
-    #
-    # Unfortunately, "python -m SimpleHTTPServer" doesn't allow you to redefine
-    # the default content-type, but the SimpleHTTPServer module can be executed
-    # manually with just a few lines of code.
-    python -c $'import SimpleHTTPServer;\nSimpleHTTPServer.SimpleHTTPRequestHandler.extensions_map[""] = "text/plain";\nSimpleHTTPServer.test();' "$port"
-}
-
-# TODO: merge this from @mathiasbynens with the above from @necolas
-# # Start an HTTP server from a directory, optionally specifying the port
-# function server() {
-#     local port="${1:-8000}";
-#     sleep 1 && open "http://localhost:${port}/" &
-#     # Set the default Content-Type to `text/plain` instead of `application/octet-stream`
-#     # And serve everything as UTF-8 (although not technically correct, this doesn’t break anything for binary files)
-#     python -c $'import SimpleHTTPServer;\nmap = SimpleHTTPServer.SimpleHTTPRequestHandler.extensions_map;\nmap[""] = "text/plain";\nfor key, value in map.items():\n\tmap[key] = value + ";charset=UTF-8";\nSimpleHTTPServer.test();' "$port";
-# }
-
-# Simple calculator - credit:@mathiasbynens
-function calc() {
-    local result="";
-    result="$(printf "scale=10;$*\n" | bc --mathlib | tr -d '\\\n')";
-    #                       └─ default (when `--mathlib` is used) is 20
-    #
-    if [[ "$result" == *.* ]]; then
-        # improve the output for decimal numbers
-        printf "$result" |
-        sed -e 's/^\./0./'        `# add "0" for cases like ".5"` \
-            -e 's/^-\./-0./'      `# add "0" for cases like "-.5"`\
-            -e 's/0*$//;s/\.$//';  # remove trailing zeros
-    else
-        printf "$result";
-    fi;
-    printf "\n";
-}
-
-# Change working directory to the top-most Finder window location
+# Change working directory to the top-most Finder window location - credit:@mathiasbynens
 function cdf() { # short for `cdfinder`
     cd "$(osascript -e 'tell app "Finder" to POSIX path of (insertion location as alias)')";
 }
 
-# Create a .tar.gz archive, using `zopfli`, `pigz` or `gzip` for compression
-function targz() {
-    local tmpFile="${@%/}.tar";
-    tar -cvf "${tmpFile}" --exclude=".DS_Store" "${@}" || return 1;
-
-    size=$(
-        stat -f"%z" "${tmpFile}" 2> /dev/null; # OS X `stat`
-        stat -c"%s" "${tmpFile}" 2> /dev/null # GNU `stat`
-    );
-
-    local cmd="";
-    if (( size < 52428800 )) && hash zopfli 2> /dev/null; then
-        # the .tar file is smaller than 50 MB and Zopfli is available; use it
-        cmd="zopfli";
-    else
-        if hash pigz 2> /dev/null; then
-            cmd="pigz";
-        else
-            cmd="gzip";
-        fi;
-    fi;
-
-    echo "Compressing .tar using \`${cmd}\`…";
-    "${cmd}" -v "${tmpFile}" || return 1;
-    [ -f "${tmpFile}" ] && rm "${tmpFile}";
-    echo "${tmpFile}.gz created successfully.";
-}
-
-# Determine size of a file or total size of a directory
-function fs() {
-    if du -b /dev/null > /dev/null 2>&1; then
-        local arg=-sbh;
-    else
-        local arg=-sh;
-    fi
-    if [[ -n "$@" ]]; then
-        du $arg -- "$@";
-    else
-        du $arg .[^.]* *;
-    fi;
-}
-
-# Use Git’s colored diff when available
+# Use Git’s colored unified diff when available
 hash git &>/dev/null;
 if [ $? -eq 0 ]; then
     function diff() {
@@ -503,277 +374,8 @@ if [ $? -eq 0 ]; then
     }
 fi;
 
-# Create a git.io short URL
-function gitio() {
-    if [ -z "${1}" -o -z "${2}" ]; then
-        echo "Usage: \`gitio slug url\`";
-        return 1;
-    fi;
-    curl -i http://git.io/ -F "url=${2}" -F "code=${1}";
-}
 
-# Syntax-highlight JSON strings or files
-# Usage: `json '{"foo":42}'` or `echo '{"foo":42}' | json`
-function json() {
-    if [ -t 0 ]; then # argument
-        python -mjson.tool <<< "$*" | pygmentize -l javascript;
-    else # pipe
-        python -mjson.tool | pygmentize -l javascript;
-    fi;
-}
 
-# TODO: adjudicate this from @gf3 with above function
-# # Pretty print JSON
-# cjson () {
-#   local url=$(echo $1)
-#   if [[ "http" == $url[0,4] ]] ; then
-#     curl --silent $url | python -mjson.tool | pygmentize -O style=monokai -f console256 -g
-#   else
-#     cat $url | python -mjson.tool | pygmentize -O style=monokai -f console256 -g
-#   fi
-# }
-
-# Run `dig` and display the most useful info
-function digga() {
-    dig +nocmd "$1" any +multiline +noall +answer;
-}
-
-# UTF-8-encode a string of Unicode symbols
-function escape() {
-    printf "\\\x%s" $(printf "$@" | xxd -p -c1 -u);
-    # print a newline unless we’re piping the output to another program
-    if [ -t 1 ]; then
-        echo ""; # newline
-    fi;
-}
-
-# Decode \x{ABCD}-style Unicode escape sequences
-function unidecode() {
-    perl -e "binmode(STDOUT, ':utf8'); print \"$@\"";
-    # print a newline unless we’re piping the output to another program
-    if [ -t 1 ]; then
-        echo ""; # newline
-    fi;
-}
-
-# Get a character’s Unicode code point
-function codepoint() {
-    perl -e "use utf8; print sprintf('U+%04X', ord(\"$@\"))";
-    # print a newline unless we’re piping the output to another program
-    if [ -t 1 ]; then
-        echo ""; # newline
-    fi;
-}
-
-# Show all the names (CNs and SANs) listed in the SSL certificate
-# for a given domain
-function getcertnames() {
-    if [ -z "${1}" ]; then
-        echo "ERROR: No domain specified.";
-        return 1;
-    fi;
-
-    local domain="${1}";
-    echo "Testing ${domain}…";
-    echo ""; # newline
-
-    local tmp=$(echo -e "GET / HTTP/1.0\nEOT" \
-        | openssl s_client -connect "${domain}:443" 2>&1);
-
-    if [[ "${tmp}" = *"-----BEGIN CERTIFICATE-----"* ]]; then
-        local certText=$(echo "${tmp}" \
-            | openssl x509 -text -certopt "no_header, no_serial, no_version, \
-            no_signame, no_validity, no_issuer, no_pubkey, no_sigdump, no_aux");
-            echo "Common Name:";
-            echo ""; # newline
-            echo "${certText}" | grep "Subject:" | sed -e "s/^.*CN=//";
-            echo ""; # newline
-            echo "Subject Alternative Name(s):";
-            echo ""; # newline
-            echo "${certText}" | grep -A 1 "Subject Alternative Name:" \
-                | sed -e "2s/DNS://g" -e "s/ //g" | tr "," "\n" | tail -n +2;
-            return 0;
-    else
-        echo "ERROR: Certificate not found.";
-        return 1;
-    fi;
-}
-
-# `tre` is a shorthand for `tree` with hidden files and color enabled, ignoring
-# the `.git` directory, listing directories first. The output gets piped into
-# `less` with options to preserve color and line numbers, unless the output is
-# small enough for one screen.
-function tre() {
-    tree -aC -I '.git|node_modules|bower_components' --dirsfirst "$@" | less -FRNX;
-}
-
-# Image width
-width () {
-  echo $(sips -g pixelWidth $1 | grep -oE "[[:digit:]]{1,}$")
-}
-
-# Image height
-height () {
-  echo $(sips -g pixelHeight $1 | grep -oE "[[:digit:]]{1,}$")
-}
-
-# Set the terminal's title bar.
-function titlebar() {
-  echo -n $'\e]0;'"$*"$'\a'
-}
-
-# Search History - credit:alrra
-qh() {
-    #           ┌─ enable colors for pipe
-    #           │  ("--color=auto" enables colors only if
-    #           │  the output is in the terminal)
-    grep --color=always "$*" "$HISTFILE" |       less -RX
-    # display ANSI color escape sequences in raw form ─┘│
-    #       don't clear the screen after quitting less ─┘
-}
-
-# Search for text within the current directory  - credit:alrra
-qt() {
-    grep -ir --color=always "$*" . | less -RX
-    #     │└─ search all files under each directory, recursively
-    #     └─ ignore case
-}
-
-# Move the given file(s) to the Trash.
-# Credit: @janmoesen
-# TODO: heredoc is not working with leading spaces in subl syntax highlighting
-# function trash {
-#     local path;
-#     for path; do
-#         # Make relative paths "absolutey".
-#         [ "${path:0:1}" = '/' ] || path="$PWD/$1";
-
-#         # Execute the AppleScript to nudge Finder.
-#         echo "$(cat <<-EOD
-#             tell application "Finder"
-#                 delete POSIX file "${path//\"/\"}"
-#             end
-#         EOD)" | osascript;
-#     done;
-# }
-
-# Show the given file(s) in the Finder.
-# Credit: @janmoesen
-function show {
-    # Default to the current directory.
-    [ $# -eq 0 ] && set -- .;
-
-    # Build the array of paths for AppleScript.
-    local path paths=();
-    for path; do
-        # Make sure each path exists.
-        if ! [ -e "$path" ]; then
-            echo "show: $path: No such file or directory";
-            continue;
-        fi;
-
-        # Crappily re-implement "readlink -f" ("realpath") for Darwin.
-        # (The "cd ... > /dev/null" hides CDPATH noise.)
-        [ -d "$path" ] \
-            && path="$(cd "$path" > /dev/null && pwd)" \
-            || path="$(cd "$(dirname "$path")" > /dev/null && \
-                       echo "$PWD/$(basename "$path")")";
-
-        # Use the "POSIX file" AppleScript syntax.
-        paths+=("POSIX file \"${path//\"/\"}\"");
-    done;
-    [ "${#paths[@]}" -eq 0 ] && return;
-
-    # Group all output to pipe through osacript.
-    {
-        echo 'tell application "Finder"';
-        echo -n 'select {'; # "reveal" would select only the last file.
-
-        for ((i = 0; i < ${#paths[@]}; i++)); do
-            echo -n "${paths[$i]}";
-            [ $i -lt $(($# - 1)) ] && echo -n ', '; # Ugly array.join()...
-        done;
-
-        echo '}';
-        echo 'activate';
-        echo 'end tell';
-    } | osascript;
-}
-
-# Sort the "du" output and use human-readable units.
-# Credit: @janmoesen
-function duh {
-    du -sk "$@" | sort -n | while read size fname; do
-        for unit in KiB MiB GiB TiB PiB EiB ZiB YiB; do
-            if [ "$size" -lt 1024 ]; then
-                echo -e "${size} ${unit}\t${fname}";
-                break;
-            fi;
-            size=$((size/1024));
-        done;
-    done;
-}
-
-# Compare one or more URLs "before" and "after".
-# Credit: @janmoesen
-function diff-url () {(
-    cd /tmp || return $?;
-    local urls=() before=() after=();
-
-    # Remember all URLs.
-    local url;
-    for url; do
-        urls+=("$url");
-    done;
-
-    # Save all URLs to "before and after".
-    local curr;
-    for curr in {before,after}; do
-        read -p "Press Enter to save $curr...";
-
-        local i;
-        for ((i = 0; i < ${#urls[@]}; i++)); do
-            url="${urls[$i]}";
-            num="$(printf '%02d' "$i")";
-            file="$curr-$num.html";
-            [ "$curr" = 'before' ] \
-                && before+=("$file") \
-                || after+=("$file");
-            wget -qO- "$url" | sed 's/m=[0-9]*//g; s/[0-9a-f]\{32\}//g; s/[0-9]* keer bekeken//' > "$file";
-            [ -z "$prev_x" ] && prev_x="$x";
-        done;
-    done;
-
-    # Loop through all URLs to diff their before and after.
-    for ((i = 0; i < ${#urls[@]}; i++)); do
-        url="${urls[$i]}";
-        num="$(printf '%02d' "$i")";
-        before="${before[$i]}";
-        after="${after[$i]}";
-        udiff --label="$url (before)" --label="$url (after)" "$before" "$after";
-        rm -f "$before" "$after";
-    done | colordiff | less -XFIRd;
-)}
-
-# Convert the parameters or STDIN to lowercase.
-# Credit: @janmoesen
-function lc {
-    if [ $# -eq 0 ]; then
-        tr '[:upper:]' '[:lower:]';
-    else
-        tr '[:upper:]' '[:lower:]' <<< "$@";
-    fi;
-}
-
-# Convert the parameters or STDIN to uppercase.
-# Credit: @janmoesen
-function uc {
-    if [ $# -eq 0 ]; then
-        tr '[:lower:]' '[:upper:]';
-    else
-        tr '[:lower:]' '[:upper:]' <<< "$@";
-    fi;
-}
 
 ##############################################################################
 # Completion
@@ -854,6 +456,7 @@ export PS2="\[${yellow}\]→ \[${reset}\]";
 
 
 ##############################################################################
-# Cleanup
+# Local configuration and overrides
 ##############################################################################
-unset path_append path_prepend path_remove
+
+[[ -e "${DOTFILES_DIR}/private/bash_profile" ]] && source "${DOTFILES_DIR}/private/bash_profile"

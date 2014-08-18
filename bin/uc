@@ -1,0 +1,23 @@
+#!/usr/bin/env bash
+
+# % uc(1) LICENSE: MIT | Dotfile Utilities
+# % Jan Moesen <https://github.com/janmoesen/tilde>
+#
+# NAME
+# ====
+#
+# __uc__ - Convert the parameters or STDIN to uppercase.
+#
+# USAGE
+# =====
+#
+# __uc__ [text]
+# - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+
+show-help "$1" "$BASH_SOURCE" && exit
+
+if [ $# -eq 0 ]; then
+    tr '[:lower:]' '[:upper:]';
+else
+    tr '[:lower:]' '[:upper:]' <<< "$@";
+fi;

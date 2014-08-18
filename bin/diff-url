@@ -1,0 +1,54 @@
+#!/usr/bin/env bash
+
+# % diff-url(1) LICENSE: MIT | Dotfile Utilities
+# % Jan Moesen <https://github.com/janmoesen/tilde>\
+# modified by Mike Henderson <https://github.com/mvhenderson/dotfiles>
+#
+# NAME
+# ====
+#
+# __diff-url__ - Compare one or more URLs "before" and "after".
+#
+# USAGE
+# =====
+#
+# __diff-url__ URLS...
+# - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+
+show-help "$1" "$BASH_SOURCE" true && exit
+
+cd /tmp || exit $?;
+urls=()
+before=()
+after=()
+
+# Remember all URLs.
+for url; do
+    urls+=("$url");
+done;
+
+# Save all URLs to "before and after".
+for curr in {before,after}; do
+    read -p "Press Enter to save $curr...";
+
+    for ((i = 0; i < ${#urls[@]}; i++)); do
+        url="${urls[$i]}";
+        num="$(printf '%02d' "$i")";
+        file="$curr-$num.html";
+        [ "$curr" = 'before' ] \
+            && before+=("$file") \
+            || after+=("$file");
+        wget -qO- "$url" | sed 's/m=[0-9]*//g; s/[0-9a-f]\{32\}//g; s/[0-9]* keer bekeken//' > "$file";
+        [ -z "$prev_x" ] && prev_x="$x";
+    done;
+done;
+
+# Loop through all URLs to diff their before and after.
+for ((i = 0; i < ${#urls[@]}; i++)); do
+    url="${urls[$i]}";
+    num="$(printf '%02d' "$i")";
+    before="${before[$i]}";
+    after="${after[$i]}";
+    git diff --no-index --color-words "$before" "$after";  # --label="$url (before)" --label="$url (after)"
+    rm -f "$before" "$after";
+done | less -XFIRd;

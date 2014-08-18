@@ -1,0 +1,22 @@
+#!/usr/bin/env bash
+
+# % unidecode(1) LICENSE: MIT | Dotfile Utilities
+# % Mathias Bynens <https://github.com/mathiasbynens/dotfiles>
+#
+# NAME
+# ====
+#
+# __unidecode__ - Decode \x{ABCD}-style Unicode escape sequences
+#
+# USAGE
+# =====
+#
+# __unidecode__ string
+# - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+show-help "$1" "$BASH_SOURCE" true && exit
+
+perl -e "binmode(STDOUT, ':utf8'); print \"$@\"";
+# print a newline unless we’re piping the output to another program
+if [ -t 1 ]; then
+    echo ""; # newline
+fi;

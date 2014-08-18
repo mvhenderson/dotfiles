@@ -1,0 +1,34 @@
+#!/usr/bin/env bash
+
+# % fs(1) LICENSE: MIT | Dotfile Utilities
+# % Mathias Bynens <https://github.com/mathiasbynens/dotfiles>
+#
+# NAME
+# ====
+#
+# __fs__ - Show size of a file or total size of a directory
+#
+# DESCRIPTION
+# ===========
+#
+# If the __du__ option __-b__ is available outputs apparent file size, otherwise
+# outputs the block size.
+#
+# USAGE
+# =====
+#
+# __fs__ [file | directory]
+# - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+
+show-help "$1" "$BASH_SOURCE" && exit
+
+if du -b /dev/null > /dev/null 2>&1; then
+    arg=-sbh;
+else
+    arg=-sh;
+fi
+if [[ -n "$@" ]]; then
+    du $arg -- "$@";
+else
+    du $arg .[^.]* *;
+fi;

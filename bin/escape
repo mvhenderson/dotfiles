@@ -1,0 +1,22 @@
+#!/usr/bin/env bash
+
+# % escape(1) LICENSE: MIT | Dotfile Utilities
+# % Mathias Bynens <https://github.com/mathiasbynens/dotfiles>
+#
+# NAME
+# ====
+#
+# __escape__ - UTF-8-encode a string of Unicode symbols
+#
+# USAGE
+# =====
+#
+# __escape__ string
+# - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+show-help "$1" "$BASH_SOURCE" true && exit
+
+printf "\\\x%s" $(printf "$@" | xxd -p -c1 -u);
+# print a newline unless we’re piping the output to another program
+if [ -t 1 ]; then
+    echo ""; # newline
+fi;

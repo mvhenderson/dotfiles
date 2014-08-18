@@ -1,0 +1,32 @@
+#!/usr/bin/env bash
+
+# % calc(1) LICENSE: MIT | Dotfile Utilities
+# % Mathias Bynens <https://github.com/mathiasbynens/dotfiles>
+#
+# NAME
+# ====
+#
+# __calc__ - Simple calculator
+#
+# USAGE
+# =====
+#
+# __calc__ expression
+# - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+
+show-help "$1" "$BASH_SOURCE" && exit
+
+result="";
+result="$(printf "scale=10;$*\n" | bc --mathlib | tr -d '\\\n')";
+#                       └─ default (when `--mathlib` is used) is 20
+#
+if [[ "$result" == *.* ]]; then
+    # improve the output for decimal numbers
+    printf "$result" |
+    sed -e 's/^\./0./'        `# add "0" for cases like ".5"` \
+        -e 's/^-\./-0./'      `# add "0" for cases like "-.5"`\
+        -e 's/0*$//;s/\.$//';  # remove trailing zeros
+else
+    printf "$result";
+fi;
+printf "\n";

@@ -1,8 +1,30 @@
-#!/bin/sh
+#!/usr/bin/env bash
+
+# % search(1) LICENSE: MIT | Dotfile Utilities
+# % Mike Henderson <https://github.com/mvhenderson/dotfiles>
+# % August 17, 2014
 #
-# Quick search in a directory for a string ($1).
+# NAME
+# ====
 #
+# __search__ - search with colorized output piped to less
+#
+# USAGE
+# =====
+#
+# __search__ [ack_options] PATTERN
+#
+# DESCRIPTION
+# ===========
+#
+# Defaults to case-insentitive search using __ack__. Additional __ack__ options
+# may be specified on the command line.
+# - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+# TODO: learn why other .dotfile repo's use the set -e
 set -e
 
-# use -iru to search directories ack usually ignores (like .git)
-ack -i $1
+show-help "$1" "$BASH_SOURCE" true && exit
+
+ack -i --color $* | less -RXFi
+#    │ └─ force color through pipe
+#    └─ ignore case

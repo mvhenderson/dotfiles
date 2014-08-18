@@ -1,0 +1,82 @@
+#!/usr/bin/env bash
+
+# % show-help(1) LICENSE: MIT | Dotfile Utilties
+# % Mike Henderson <https://github.com/mvhenderson/dotfiles>
+# % August 10, 2014
+#
+# NAME
+# ====
+#
+# show-help - Display help from script header comment
+#
+# USAGE
+# =====
+#
+# show-help option script [required]
+#
+# DESCRIPTION
+# ===========
+#
+# When command line _option_ of _script_ is **-h** or **--help** then display
+# the script header comment text up to the terminal marker (# - -). When
+# _required_ is true and _option_ is null then help is displayed.
+#
+# If __Pandoc__ is available the header is processed as markdown then converted
+# to a man page which can then be piped to a PAGER.
+#
+# Sample Header
+# -------------
+#
+#     # !/usr/bin/env bash
+#
+#     # % awesome(1) LICENSE: MIT | Awesome Utilties
+#     # % Author Name <https://github.com/author/repo>
+#     # % August 10, 2014
+#     #
+#     # NAME
+#     # ====
+#     #
+#     # awesome - Awesome awesomeness
+#     # - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+#
+# EXAMPLES
+# ========
+#
+# Typical use from a script, only checks first option for -h or --help:
+#
+#     show-help "$1" "$BASH_SOURCE" && exit
+#
+# Check for help flag and also require at least one command line option:
+#
+#     show-help "$1" "$BASH_SOURCE" true && exit
+#
+# Show help and colorize it like **man** when **Pandoc** is installed:
+#
+#     show-help -h | less -RXF
+#
+# SEE ALSO
+# ========
+# Pandoc <http://johnmacfarlane.net/pandoc/>
+# - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+
+if [[ ( -z $1 && $3) || "$1" == "-h" || "$1" == "--help" ]]; then
+    script="${2:-$BASH_SOURCE}"
+
+    if [ $(type -P pandoc) ]; then
+        sed -n -E '/^#/{/^#!.*$/d;/^# - -/q;s/^#[[:space:]]?//;p;}' "$script" \
+        | md2man
+    else
+        sed -n -E '/^#/{/^#!.*$/d;/^# - -/q;s/^#[[:space:]]?//;p;}' "$script"
+        #          └┬─┘ └───┬───┘ └───┬───┘ └────────┬───────┘ └─ print line
+        #           │       │         │              └─ remove lead hash/space
+        #           │       │         └─ quit at end marker
+        #           │       └─ remove crunch bang line
+        #           └─ match all comments
+    fi
+
+    # help shown, success exist
+    exit 0
+fi;
+
+# help not shown, failure exit
+exit 1

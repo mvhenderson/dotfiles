@@ -1,0 +1,24 @@
+#!/usr/bin/env bash
+
+# % gz(1) LICENSE: MIT | Dotfile Utilities
+# % Lars Kappert <http://github.com/webpro/dotfiles>
+#
+# NAME
+# ====
+#
+# __gz__ - Get gzipped file size
+#
+# USAGE
+# =====
+#
+# __gz__ file
+# - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+
+show-help "$1" "$BASH_SOURCE" && exit
+
+origsize=$(wc -c < "$1")
+gzipsize=$(gzip -c "$1" | wc -c)
+ratio=$(echo "$gzipsize * 100/ $origsize" | bc -l)
+saved=$(echo "($origsize - $gzipsize) * 100/ $origsize" | bc -l)
+printf "orig: %d bytes\ngzip: %d bytes\nsave: %2.0f%% (%2.0f%%)\n" "$origsize" "$gzipsize" "$saved" "$ratio"
+

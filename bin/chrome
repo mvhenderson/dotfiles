@@ -1,3 +1,24 @@
-#!/bin/bash
+#!/usr/bin/env bash
+
+# % chrome(1) LICENSE: MIT | Dotfile Utilities
+# % Mike Henderson <https://github.com/mvhenderson/dotfiles>
+# % August 17, 2014
+#
+# NAME
+# ====
+#
+# __chrome__ - Open URL in Google Chrome
+#
+# USAGE
+# =====
+#
+# __chrome__ URL
+#
+# EXAMPLE
+#
+#     chrome http://google.com
+# - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+
+show-help "$1" "$BASH_SOURCE" true && exit
 
 open -a Google\ Chrome "$1"

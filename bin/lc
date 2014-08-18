@@ -1,0 +1,23 @@
+#!/usr/bin/env bash
+
+# % lc(1) LICENSE: MIT | Dotfile Utilities
+# % Jan Moesen <https://github.com/janmoesen/tilde>
+#
+# NAME
+# ====
+#
+# __lc__ - Convert the parameters or STDIN to lowercase.
+#
+# USAGE
+# =====
+#
+# __lc__ [text]
+# - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+
+show-help "$1" "$BASH_SOURCE" && exit
+
+if [ $# -eq 0 ]; then
+    tr '[:upper:]' '[:lower:]';
+else
+    tr '[:upper:]' '[:lower:]' <<< "$@";
+fi;

@@ -1,0 +1,18 @@
+#!/usr/bin/env bash
+
+# % digga(1) LICENSE: MIT | Dotfile Utilities
+# % Mathias Bynens <https://github.com/mathiasbynens/dotfiles>
+#
+# NAME
+# ====
+#
+# __digga__ - Run `dig` and display the most useful info
+#
+# USAGE
+# =====
+#
+# __digga__ ip
+# - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+show-help "$1" "$BASH_SOURCE" && exit
+
+dig +nocmd "$1" any +multiline +noall +answer

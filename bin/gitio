@@ -1,33 +1,38 @@
-#!/usr/bin/env ruby
-# Usage: gitio URL [CODE]
+#!/usr/bin/env bash
+
+# % gitio(1) LICENSE: MIT | Dotfile Utilities
+# % Mathias Bynens <https://github.com/mathiasbynens/dotfiles>\
+# modified by Mike Henderson <https://github.com/mvhenderson/dotfiles>
+# % August 13, 2014
 #
-# Turns a github.com URL
-#  into a git.io URL
+# NAME
+# ====
 #
-# Created by @defunkt:
-#  https://gist.github.com/1209316 
+# __gitio__ - Create a git.io short URL from a github.com URL and copy it
 #
-# Copies the git.io URL to your clipboard.
+# USAGE
+# =====
+#
+# __gitio__ url [slug]
+#
+# - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+# Reference
+# - http://gist.github.com/defunkt/1209316
+# - https://gist.github.com/przemoc/1275673
+# TODO
+# - validate url is github
 
-url  = ARGV[0]
-code = ARGV[1]
+show-help "$1" "$BASH_SOURCE" true && exit
 
-if url !~ /^(https?:\/\/)?(gist\.)?github.com/
-  abort "* github.com URLs only"
-end
+url="${1}"
+code="${2:+-F code=$2}"
 
-if url !~ /^http/
-  url = "https://#{url}"
-end
+output=$(curl -i http://git.io/ -F "url=${1}" "${code}" 2> /dev/null)
+short=$(echo "${output}" | sed '/^Location: /!d;s///' | tr -d '\r\n')
 
-if code
-  code = "-F code=#{code}"
-end
-
-output = `curl -i http://git.io -F 'url=#{url}' #{code} 2> /dev/null`
-if output =~ /Location: (.+)\n?/
-  puts $1
-  `echo #$1 | pbcopy`
+if [[ -n "${short}" ]]; then
+    echo "=> ${short} copied to pasteboard."
+    echo "${short}" | pbcopy
 else
-  puts output
-end
+    printf "${output}\n\nFAILED!\n"
+fi

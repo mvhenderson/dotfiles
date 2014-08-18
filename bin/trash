@@ -1,0 +1,26 @@
+#!/usr/bin/env bash
+
+# % trash(1) LICENSE: MIT | Dotfile Utilities
+# % Jan Moesen <https://github.com/janmoesen/tilde>\
+# modified by Mike Henderson <https://github.com/mvhenderson/dotfiles>
+#
+# NAME
+# ====
+#
+# __trash__ - Move the given file(s) to the Trash
+#
+# USAGE
+# =====
+#
+# __trash__ FILES...
+# - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+
+show-help "$1" "$BASH_SOURCE" true && exit
+
+# Make relative paths "absolutey".
+path="$1"
+[ "${path:0:1}" = '/' ] || path="$PWD/$1";
+
+# Execute the AppleScript to nudge Finder.
+printf "tell application \"Finder\"\n\tdelete POSIX file \"${path//\"/\"}\"\nend" \
+| osascript;

@@ -1,0 +1,21 @@
+#!/usr/bin/env bash
+
+# % http-compression(1) LICENSE: MIT | Dotfile Utilities
+# % Lars Kappert <http://github.com/webpro/dotfiles>
+#
+# NAME
+# ====
+#
+# __http-compression__ - Check if resource is compressed and show stats
+#
+# USAGE
+# =====
+#
+# __http-compression__ url
+# - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+
+show-help "$1" "$BASH_SOURCE" && exit
+
+curl --write-out 'Size (uncompressed) = %{size_download}\n' --silent --output /dev/null $1
+curl --header 'Accept-Encoding: gzip,deflate,compress' --write-out 'Size (compressed) =   %{size_download}\n' --silent --output /dev/null $1
+curl --head --header 'Accept-Encoding: gzip,deflate' --silent $1 | grep -i "cache\|content\|vary\|expires"

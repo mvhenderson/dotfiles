@@ -90,6 +90,7 @@ if have_gitconfig; then
     read_gitconfig
 else
     prompt_gitconfig
+    write_gitconfig
 fi
 
 log_header "Prerequsites"

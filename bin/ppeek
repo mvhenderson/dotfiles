@@ -1,8 +1,28 @@
 #!/bin/sh
-# Usage: ppeek [<prefix>]
+
+# % ppeek(1) LICENSE: MIT | Dotfile Utilities
+# % Ryan Tomayko <https://github.com/rtomayko/dotfiles>
+#
+# NAME
+# ====
+#
+# __ppeek__ - Read lines from STDIN and write to both STDOUT and STDERR
+#
+# USAGE
+# =====
+#
+# __ppeek__ [prefix]
+#
+# DESCRIPTION
+# ===========
+#
 # Read lines from standard input and write to both standard output and
 # standard error. This is useful for peeking in on a pipeline.
+# - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+show-help "$1" "$BASH_SOURCE" && exit
+
 set -e
+
 prefix="${1:-> }"
 while read -r line
 do echo "$line"

@@ -1,0 +1,22 @@
+#!/usr/bin/env bash
+
+# % codepoint(1) LICENSE: MIT | Dotfile Utilities
+# % Mathias Bynens <https://github.com/mathiasbynens/dotfiles>
+#
+# NAME
+# ====
+#
+# __codepoint__ - Get a character’s Unicode code point
+#
+# USAGE
+# =====
+#
+# __codepoint__ character
+# - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+show-help "$1" "$BASH_SOURCE" true && exit
+
+perl -e "use utf8; print sprintf('U+%04X', ord(\"$@\"))";
+# print a newline unless we’re piping the output to another program
+if [ -t 1 ]; then
+    echo ""; # newline
+fi;

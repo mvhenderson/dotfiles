@@ -1,3 +1,62 @@
+#!/usr/bin/env bash
+
+# % ipsum(1) LICENSE: MIT | Dotfile Utilities
+# % Wynn Netherland <https://github.com/pengwynn/dotfiles>
+# % April 09, 2013
+#
+# NAME
+# ====
+#
+# __ipsum__ - Grab some placeholder copy from http://loripsum.net/
+#
+# USAGE
+# =====
+#
+# __ipsum__ [options...]
+#
+# OPTIONS
+# =======
+#
+# __--headings__ Add headings
+#
+# __--short__ Use short paragraph length
+#
+# __--medium__ Use medium paragraph length
+#
+# __--long__ Use long paragraph length
+#
+# __--verylong__ Use verylong paragraph length
+#
+# __--decorate__ Add bold, italic and marked text
+#
+# __--links__ Add links
+#
+# __--ol__ Add ordered lists
+#
+# __--ul__ Add unordered lists
+#
+# __--dl__ Add description lists
+#
+# __--bq__ Add blockquotes
+#
+# __--code__ Add code blocks
+#
+# __--caps__ Use ALL CAPS
+#
+# __--prude__ Use prude version
+#
+# __--[no-]plain__ Return plain text
+#
+# __--[no-]html__ Return html
+#
+#
+# EXAMPLE
+# =======
+#
+# ipsum --headings --long --plain
+# - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+show-help "$1" "$BASH_SOURCE" && exit
+
 #!/bin/bash
 
 URL="http://loripsum.net/api"
@@ -20,34 +79,6 @@ PRUDE=0
 # Gets the command name without path
 cmd(){ echo `basename $0`; }
 
-# Help command output
-usage(){
-echo "\
-`cmd` [OPTION...]
-
-Grab some placeholder copy from http://loripsum.net/
-
-Example: `cmd` --headings --long --plain
-
---headings; Add headings
---short; Use short paragraph length
---medium; Use medium paragraph length
---long; Use long paragraph length
---verylong; Use verylong paragraph length
---decorate; Add bold, italic and marked text
---links; Add links
---ol; Add ordered lists
---ul; Add unordered lists
---dl; Add description lists
---bq; Add blockquotes
---code; Add code blocks
---caps; Use ALL CAPS
---prude; Use prude version
---[no-]plain; Return plain text
---[no-]html; Return html 
-" | column -t -s ";"
-}
-
 # Error message
 error(){
     echo "`cmd`: invalid option -- '$1'";
@@ -63,7 +94,6 @@ for pass in 1 2; do
         case $1 in
             --) shift; break;;
             -*) case $1 in
-                -h|--help)             usage; exit 1;;
                 -d|--debug)            DEBUG=1;;
                 --headings)            HEADINGS=1;;
                 --short)               LENGTH="short";;

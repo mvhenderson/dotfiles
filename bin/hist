@@ -1,0 +1,27 @@
+#!/usr/bin/env bash
+
+# % hist(1) LICENSE: MIT | Dotfile Utilities
+# % Catalin Maris <https://github.com/alrra/dotfiles>\
+# modified by Mike Henderson <https://github.com/mvhenderson/dotfiles>
+#
+# NAME
+# ====
+#
+# __hist__ - Search history with colorized grep through less
+#
+# USAGE
+# =====
+#
+# __hist__ PATTERN
+# - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+
+show-help "$1" "$BASH_SOURCE" true && exit
+
+#           ┌─ enable colors for pipe
+#           │  ("--color=auto" enables colors only if
+#           │  the output is in the terminal)
+grep --color=always "$*" "$HISTFILE" | less -RXFi
+#       display ANSI color escape sequences ─┘│││
+#      don't clear the screen after quitting ─┘││
+#      auto exit when file fits on one screen ─┘│
+# insensitive search (unless pattern has caps) ─┘

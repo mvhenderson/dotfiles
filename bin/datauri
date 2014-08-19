@@ -1,0 +1,25 @@
+#!/usr/bin/env bash
+
+# % datauri(1) LICENSE: MIT | Dotfile Utilities
+# % Nicolas Gallagher <https://github.com/necolas/dotfiles>
+#
+# NAME
+# ====
+#
+# __datauri__ - Create a data URI from file and copy to pasteboard
+#
+# USAGE
+# =====
+#
+# __datauri__ file
+# - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+
+show-help "$1" "$BASH_SOURCE" && exit
+
+mimeType=$(file -b --mime-type "$1")
+if [[ $mimeType == text/* ]]; then
+    mimeType="${mimeType};charset=utf-8"
+fi
+printf "data:${mimeType};base64,$(openssl base64 -in "$1" | tr -d '\n')" \
+| pbcopy \
+| printf "=> data URI copied to pasteboard.\n"

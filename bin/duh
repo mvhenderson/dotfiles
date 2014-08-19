@@ -1,0 +1,55 @@
+#!/usr/bin/env bash
+
+# % duh(1) LICENSE: MIT | Dotfile Utilities
+# % Jan Moesen <https://github.com/janmoesen/tilde>\
+# Modified by Mike Henderson <https://github.com/mvhenderson/dotfiles>
+# % August 10, 2014
+#
+# NAME
+# ====
+#
+# __duh__ - Show disk block usage in sorted, human-readable format
+#
+# USAGE
+# =====
+#
+# __duh__ [du options]
+#
+# DESCRIPTION
+# ===========
+#
+# __duh__ wraps the __du__ utility with human-readable units and ascending sort.
+#
+# __duh__ supports all __du__ options except for __-g__, and __-m__ which would
+# intefere with the unit calculation, __-k__ which is implied and __-h__ which
+# is repurposed to show this help text.
+#
+# EXAMPLE
+# =======
+#
+# Show the size for all directories of the current directory:
+#
+#     $ duh -d 1
+#        32K  ./private
+#        48K  ./conf
+#        80K  ./shell
+#        88K  ./lib
+#       448K  ./caches
+#       728K  ./bin
+#         3M  ./.git
+#         4M  .
+# - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+# TODO: check for unsupported options
+# TODO: add color based on size
+
+show-help "$1" "$BASH_SOURCE" && exit
+
+du -k "$@" | sort -n | while read size fname; do
+    for unit in K M G T P E Z Y; do
+        if [ "$size" -lt 1024 ]; then
+            printf "%4i%s  %s\n" $size $unit "$fname"
+            break;
+        fi;
+        size=$((size/1024));
+    done;
+done;

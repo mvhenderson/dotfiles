@@ -1,5 +1,18 @@
 #!/bin/sh
-# Usage: prune-dirs <path>...
-# Remove empty directories under and including <path>s.
+
+# % prune-dirs(1) LICENSE: MIT | Dotfile Utilities
+# % Ryan Tomayko <https://github.com/rtomayko/dotfiles>
+#
+# NAME
+# ====
+#
+# __prune-dirs__ - Remove empty directories under and including paths.
+#
+# USAGE
+# =====
+#
+# __prune-dirs__ path...
+# - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+show-help "$1" "$BASH_SOURCE" true && exit
 
 find "$@" -type d -empty -depth | xargs rmdir

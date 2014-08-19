@@ -1,0 +1,27 @@
+#!/usr/bin/env bash
+
+# % tre(1) LICENSE: MIT | Dotfile Utilities
+# % Mathias Bynens <https://github.com/mathiasbynens/dotfiles>
+#
+# NAME
+# ====
+#
+# __tre__ - show directory tree piped through less
+#
+# USAGE
+# =====
+#
+# __tre__ [DIR]
+#
+# DESCRIPTION
+# ===========
+#
+# __tre__ is a shorthand for __tree__ with hidden files and color enabled, ignoring
+# the _.git_ directory, listing directories first. The output gets piped into
+# __less__ with options to preserve color and line numbers, unless the output is
+# small enough for one screen.
+# - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+
+show-help "$1" "$BASH_SOURCE" && exit
+
+tree -aC -I '.git|node_modules|bower_components' --dirsfirst "$@" | less -FRNX;

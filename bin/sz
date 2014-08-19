@@ -1,0 +1,92 @@
+#!/usr/bin/env bash
+
+# % sz(1) LICENSE: MIT | Dotfile Utilities
+# % Mike Henderson <https://github.com/mvhenderson/dotfiles>
+# % August 13, 2014
+#
+# NAME
+# ====
+#
+# __sz__ - Show disk usage based on bytes, sorted and human-readable
+#
+# USAGE
+# =====
+#
+# __sz__ [files...] [directories...]
+#
+# DESCRIPTION
+# ===========
+#
+# Unlike the __du__ utility which uses block size and includes directory blocks
+# in the size, __sz__ reports actual sizes based on bytes.
+#
+# EXAMPLE
+# =======
+#
+# Default, show sizes for all files and directories in current directory:
+#
+#     $ sz
+#       11B  .gitattributes
+#       32B  .gitignore
+#      426B  README.md
+#        1K  LICENSE
+#        4K  conf
+#        6K  private
+#       15K  .DS_Store
+#       17K  lib
+#       29K  shell
+#      110K  bin
+#      215K  caches
+#      311K  .git
+#      686K  .
+#
+# Show the size for all directories of the current directory:
+#
+#     $ sz */
+#        4K  conf/
+#        6K  private/
+#       17K  lib/
+#       29K  shell/
+#      110K  bin/
+#      215K  caches/
+#
+# Size of a single directory:
+#
+#     $ sz .
+#      686K  .
+# - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+# SEE: http://superuser.com/questions/602818
+# TODO: force some dirs to not be recursively traversed (ie .git, node_modules)
+# =============================================================================
+
+show-help "$1" "$BASH_SOURCE" && exit
+
+# default includes all immediate file/dirs of PWD
+if [[ -z "$@" ]]; then sz . * .[^\.]*; exit; fi
+
+# collect size,name in temporary file
+TMPFILE=`mktemp /tmp/sz.XXXXXX` || exit 1
+for loc in "$@"; do
+    if [[ -d "$loc" ]]; then
+        ls -lqnR "$loc" | grep -v '^d' | awk '{total += $5} END {printf "%s",0+total}' >> $TMPFILE
+    else
+        ls -lq "$loc" | awk '{printf "%s",$5}' >> $TMPFILE
+    fi
+    printf " %s\n" "$loc" >> $TMPFILE
+done
+
+cp $TMPFILE /Volumes/RAMDisk
+# sort then convert sizes to human readable
+cat $TMPFILE | sort -n | while read size fname; do
+    for unit in B K M G T P E Z Y; do
+        if [ "$size" -lt 1024 ]; then
+            printf "%4i%s  %s\n" $size $unit "$fname"
+            break;
+        fi;
+        size=$((size/1024));
+    done;
+done;
+
+# cleanup
+rm $TMPFILE
+

@@ -1,0 +1,19 @@
+#!/usr/bin/env bash
+
+# % height(1) LICENSE: MIT | Dotfile Utilities
+# % Mathias Bynens <https://github.com/mathiasbynens/dotfiles>
+#
+# NAME
+# ====
+#
+# __height__ - Show image height
+#
+# USAGE
+# =====
+#
+# __height__ file
+# - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+
+show-help "$1" "$BASH_SOURCE" true && exit
+
+echo $(sips -g pixelHeight $1 | grep -oE "[[:digit:]]{1,}$")

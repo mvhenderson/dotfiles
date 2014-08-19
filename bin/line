@@ -1,0 +1,26 @@
+#!/usr/bin/env bash
+
+# % line(1) LICENSE: MIT | Dotfile Utilities
+# % Lars Kappert <https://github.com/webpro/dotfiles>\
+# modified by Mike Henderson <https://github.com/mvhenderson/dotfiles>
+# % August 13, 2014
+#
+# NAME
+# ====
+#
+# __line__ - show line of a file, optionally with surrounding lines
+#
+# USAGE
+# =====
+#
+# __line__ number [surrounding]
+# - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+
+show-help "$1" "$BASH_SOURCE" && exit
+
+# Show line, optionally show surrounding lines - credit:@webpro
+line() {
+    local line_number=$1
+    local lines_around=${2:-0}
+    sed -n "`expr $line_number - $lines_around`,`expr $line_number + $lines_around`p"
+}

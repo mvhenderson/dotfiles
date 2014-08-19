@@ -1,5 +1,18 @@
 #!/usr/bin/env bash
 
+# % update(1) LICENSE: MIT | Dotfile Utilities
+# % Mike Henderson <https://github.com/mvhenderson/dotfiles>
+#
+# NAME
+# ====
+#
+# __update__ - Update all the things!
+#
+# USAGE
+# =====
+#
+# __update__
+# - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 source "${DOTFILES_DIR}/lib/sys"
 
 setup_os
@@ -13,11 +26,9 @@ brew update
 printf "\n\nUpgrading formulae...\n"
 brew upgrade
 
-# printf "\n\nCleaning old formulae...\n"
-# brew cleanup
-
+# let brew handle npm update when node is upgraded
+# and only update top level modules, not their dependencies
 printf "\n\nUpdating node modules...\n"
-# npm update npm -g
 npm update --global --depth=0
 
 # printf "\n\Updating gem system...\n"

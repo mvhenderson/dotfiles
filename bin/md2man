@@ -1,0 +1,48 @@
+#!/usr/bin/env bash
+# % md2man(1) Markdown to Man | Dotfile Utilties
+# % Mike Henderson <https://github.com/mvhenderson/dotfiles>
+# % August 10, 2014
+#
+# NAME
+# ====
+#
+# md2man - Convert markdown to groff man page
+#
+#
+# USAGE
+# =====
+#
+# md2man [_files_]
+#
+#
+# DESCRIPTION
+# ===========
+#
+# Converts _files_ (or **stdin**) from markdown into man pages using Pandoc.
+#
+# EXAMPLES
+# ========
+#
+# Convert a markdown file as a man page:
+#
+#     md2man hello.md
+#
+# Use a pager to enable colorized output:
+#
+#     md2man hello.md | less
+# - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+
+show-help "$1" "$BASH_SOURCE" && exit
+
+# Inserts default formatting after the generated header (2nd line technically)
+#   .ad l - turn off left justification (jagged left edge, no adjust/fill)
+#   .nh - turn off hyphenation
+
+pandoc -s -t man "$@" \
+| sed '2 i\
+.ad l\
+' \
+| sed '2 i\
+.nh\
+' \
+| groff -Tascii -man

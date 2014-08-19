@@ -8,8 +8,10 @@ declare -a brew_taps=(
 )
 
 declare -a brew_formulae=(
+    'ack'
     'coreutils'
     'git'
+    'groff'  #the builtin groff on OS X doesn't support utf8 input
     'bash'
     'bash-completion'
     'man2html'
@@ -21,6 +23,9 @@ declare -a brew_formulae=(
     'wdiff'
     'brew-cask'
     'homebrew/dupes/rsync'
+    'zopfli'
+    'pigz'
+    'p7zip'
 )
 
 declare -a brew_casks=(

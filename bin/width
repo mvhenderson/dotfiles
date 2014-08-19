@@ -1,0 +1,19 @@
+#!/usr/bin/env bash
+
+# % width(1) LICENSE: MIT | Dotfile Utilities
+# % Mathias Bynens <https://github.com/mathiasbynens/dotfiles>
+#
+# NAME
+# ====
+#
+# __width__ - Show image width
+#
+# USAGE
+# =====
+#
+# __width__ file
+# - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+
+show-help "$1" "$BASH_SOURCE" true && exit
+
+echo $(sips -g pixelWidth $1 | grep -oE "[[:digit:]]{1,}$")

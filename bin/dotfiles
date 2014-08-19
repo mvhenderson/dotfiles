@@ -1,22 +1,28 @@
 #!/usr/bin/env bash
 
-run_help() {
-cat <<EOT
-dotfiles - Mike Henderson - https://github.com/mvhenderson/dotfiles/
-
-Initialize/sync dotfiles clone and install apps/packages
-
-Usage: $(basename "$0") [options]
-
-Options:
-    --dry-run       Runs the installer without making any changes
-    --no-sync       Suppress pulling from the remote repository
-    -h, --help      Print this help text
-
-Copyright (c) 2014 Mike Henderson. Licensed under the MIT license.
-EOT
-exit
-}
+# % dotfiles(1) LICENSE: MIT | Dotfile Utilities
+# % Mike Henderson <https://github.com/mvhenderson/dotfiles>
+# % August 7, 2014
+#
+# NAME
+# ====
+#
+# __dotfiles__ - Sync dotfiles and install apps/packages
+#
+# USAGE
+# =====
+#
+# __dotfiles__ [options]
+#
+# OPTIONS
+# =======
+#
+# __--dry-run__  Runs the installer without making any changes
+#
+# __--no-sync__  Suppress pulling from the remote repository
+#
+# __-h,--help__  Print this help text
+# - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 
 DOTFILES_DIRECTORY="${HOME}/.dotfiles"
 DOTFILES_REPOSITORY="mvhenderson/dotfiles"
@@ -65,7 +71,10 @@ for opt in $@; do
             dry_run=log_dryrun
             ;;
         --no-sync) no_sync=true ;;
-        -h|--help) run_help ;;
+        -h|--help)
+            bin/show-help "$opt" "$BASH_SOURCE"
+            exit
+            ;;
         -*|--*) log_warning "Warning: invalid option $opt" ;;
     esac
 done

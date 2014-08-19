@@ -1,40 +1,61 @@
 #!/usr/bin/env bash
-show_help() {
-cat <<EOT
-cleanup - Mike Henderson - https://github.com/mvhenderson/dotfiles/
 
-Perform cleanup operations
+# % cleanup(1) LICENSE: MIT | Dotfile Utilities
+# % Mike Henderson <https://github.com/mvhenderson/dotfiles>
+# % August 8, 2014
+#
+# NAME
+# ====
+#
+# __cleanup__ - Perform cleanup operations
+#
+# USAGE
+# =====
+#
+# __cleanup__ [options]
+#
+# OPTIONS
+# =======
+#
+# __npm__             clear the npm cache
+#
+# __brew__            clear brew downloads
+#
+# __cask__            clear cask downloads
+#
+# __trash__           empty trash
+#
+# __logs__            delete system logs (improves shell startup speed)
+#
+# __file[=pattern]__  recurively delete files matching pattern, defaults to
+#                     .DS_Store
+#
+# __dns__             flush DNS cache
+#
+# __launch__          Clean up LaunchServices to remove duplicates in the
+#                     "Open With" menu
+#
+# __all__             clean all of the above
+#
+# __--dry-run__       Runs the cleaner(s) without making any changes
+#
+# __-h, --help__      Print this help text
+#
+#
+# EXAMPLES
+# ========
+#
+#     # Dry run for all
+#     cleanup --dry-run all
+#
+#     # Just brew and cask
+#     cleanup brew cask
+#
+#     # All dump files under current dir
+#     cleanup file=*.dump
+# - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 
-Usage: $(basename "$0") [options]
-
-Options:
-    npm             clear the npm cache
-    brew            clear brew downloads
-    cask            clear cask downloads
-    trash           empty trash
-    logs            delete system logs (improves shell startup speed)
-    file[=pattern]  recurively delete files matching pattern, defaults to .DS_Store
-    dns             flush DNS cache
-    launch          Clean up LaunchServices to remove duplicates in the “Open With” menu
-
-    all             clean all of the above
-
-    --dry-run       Runs the cleaner(s) without making any changes
-    -h, --help      Print this help text
-
-Examples:
-    # Dry run for all
-    $(basename "$0") --dry-run all
-
-    # Just brew and cask
-    $(basename "$0") brew cask
-
-    # All dump files under current dir
-    $(basename "$0") file=*.dump
-
-Copyright (c) 2014 Mike Henderson. Licensed under the MIT license.
-EOT
-}
+show-help "$1" "$BASH_SOURCE" true  && exit
 
 source "${DOTFILES_DIR}/lib/sys"
 source "${DOTFILES_DIR}/lib/io"
@@ -78,7 +99,6 @@ for opt in $@; do  #TODO: will not support spaces in pattern for file=pattern
             setup_sudo true
             ;;
         --dry-run)  dry_run=log_dryrun ;;
-        -h|--help)  show_help          ;;
         -*|--*) log_warning "Warning: invalid option $opt" ;;
     esac
 done

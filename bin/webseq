@@ -12,6 +12,8 @@
 ##
 ## Example:
 ##   webseq --style=napkin awesome.seq > awesome.png
+#
+# Credit: Ryan Tomayko <https://github.com/rtomayko/dotfiles>
 require 'net/http'
 require 'uri'
 require 'open-uri'

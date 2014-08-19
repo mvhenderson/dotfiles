@@ -15,5 +15,10 @@ Make sure Dash starts at login. Setup user to hide window.
 Credits
 =======
 
-* <https://github.com/necolas/dotfiles/bin/dotfiles>
-* <https://github.com/alrra/dotfiles/bin/dotfiles>
+* Catalin Maris <https://github.com/alrra/dotfiles>
+* Jan Moesen <https://github.com/janmoesen/tilde>
+* Lars Kappert <https://github.com/webpro/dotfiles>
+* Mathias Bynens <https://github.com/mathiasbynens/dotfiles>
+* Nicolas Gallagher <https://github.com/necolas/dotfiles>
+* Ryan Tomayko <https://github.com/rtomayko/dotfiles>
+* Wynn Netherland <https://github.com/pengwynn/dotfiles>

@@ -49,6 +49,7 @@ declare -a brew_casks=(
     'quicklook-json'
     'suspicious-package'
     'webp-quicklook'
+    'java'
 )
 
 is_brew_installed() {

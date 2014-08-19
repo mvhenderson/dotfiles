@@ -1,8 +1,32 @@
-#!/bin/sh
+#!/usr/bin/env bash
 
-if [[ -z $PATTERN ]]; then
-  PATTERN='TODO|HACK|FIXME|OPTIMIZE'
-fi
+# % notes(1) LICENSE: MIT | Dotfile Utilities
+# % Mike Henderson <https://github.com/mvhenderson/dotfiles>
+# % August 18, 2014
+#
+# NAME
+# ====
+#
+# __notes__ - Search current source code for TODOs and other notes
+#
+# USAGE
+# =====
+#
+# __notes__ [tag_pattern]
+#
+# DESCRIPTION
+# ===========
+#
+# The *tag_pattern* defaults to `TODO|HACK|FIXME|OPTIMIZE`
+#
+# Based on script by Wynn Netherland <https://github.com/pengwynn/dotfiles>
+#
+# EXAMPLE
+# =======
+#
+# notes "TODO|TBD"
+# - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+show-help "$1" "$BASH_SOURCE" && exit
 
-gawk 'match($0, /^.*('$PATTERN'):?\s?(.*)$/, ary) {print FILENAME":"FNR":"ary[1]":"ary[2]}' $@
-#gn | awk -F':' '{print $3" "$1":"$2"\n"$4"\n"}'
+PATTERN=${1:-TODO|HACK|FIXME|OPTIMIZE}
+ack --color $PATTERN | less -RXFi

@@ -2,6 +2,8 @@
 #/ Usage: ports [<options>]
 #/ Show processes listening on ports.
 #/ Any <options> are passed to lsof
+#
+# Credit: https://github.com/rtomayko/dotfiles
 set -e
 
 test "$1" = "--help" && {

@@ -80,7 +80,7 @@ is_git_repo() {
 
 # Test the default SSH key against github
 github_check_key() {
-    $dryrun && return 0
+    $is_dry_run && return 0
     local tmp=$(ssh -T git@github.com 2>&1)
     [[  $tmp =~ "successfully authenticated" ]] || return 1
     return 0

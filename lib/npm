@@ -11,7 +11,7 @@ declare -a npm_modules=(
 run_npm() {
     if ! type_exists 'npm'; then
         log_warning "npm not found"
-        exit
+        return 1
     fi
 
     log_info "Installing npm modules..."

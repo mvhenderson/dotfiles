@@ -119,6 +119,15 @@ log_header "Misc"
 write_gitconfig
 configure_shell
 
+if [[ -e ~/Library/Colors/solarized.clr ]]; then
+    log_neutral "Solarized color palette already exists"
+else
+    $dry_run mkdir -p ~/Library/Colors
+    $dry_run cp -f "conf/solarized.clr" "~/Library/Colors" \
+        && log_success "Copied solarized color palette" \
+        || log_error "Failed to copy solarized color palette"
+fi
+
 log_summary
 
 # restart

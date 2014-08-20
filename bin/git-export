@@ -1,0 +1,21 @@
+#!/usr/bin/env bash
+
+# % git-export(1) LICENSE: MIT | Dotfile Utilities
+# % Paul Irish <https://github.com/paulirish/dotfiles>
+#
+# NAME
+# ====
+#
+# __git-export__ - copy repository to somewhere minus the .git stuff
+#
+# USAGE
+# =====
+#
+# __git-export__ *directory*
+# - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+
+show-help "$1" "$BASH_SOURCE" true && exit
+
+mkdir -p "$1"
+git archive master \
+| tar -x -C "$1"

@@ -346,6 +346,14 @@ alias du1="duh -d 1"
 alias du2="duh -d 2"
 alias duf="duh -d 1 . * .[^\.]*"
 
+# Undo a `git push` - credit:@paulirish
+alias undopush="git push -f origin HEAD^:master"
+
+# PlistBuddy alias, because sometimes `defaults` just doesn’t cut it
+alias plistbuddy="/usr/libexec/PlistBuddy"
+
+# Copy w/ progress - credit:paulirish
+alias cwp="rsync -WavP --human-readable --progress"
 
 
 ##############################################################################
@@ -402,7 +410,8 @@ type -P grunt &>/dev/null && eval "$(grunt --completion=bash)"
 # Add `killall` tab completion for common apps
 complete -o "nospace" -W "Contacts Calendar Dock Finder Mail Safari iTunes SystemUIServer Terminal Twitter" killall;
 
-
+# init z   https://github.com/rupa/z
+source "${DOTFILES_DIR}/conf/z/z.sh"
 
 
 ##############################################################################

@@ -9,7 +9,7 @@ declare -a npm_modules=(
 )
 
 run_npm() {
-    type_exists 'npm' || log_fatal "npm not found"
+    type_exists 'npm' || log_warning "npm not found"
 
     log_info "Installing npm modules..."
     local installed=$(npm list --global --depth=0 2> /dev/null)

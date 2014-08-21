@@ -6,6 +6,7 @@ run_link() {
     link "shell/inputrc"      ".inputrc"
     link "shell/screenrc"     ".screenrc"
 
+    link "conf/ackrc"         ".ackrc"
     link "conf/curlrc"        ".curlrc"
     link "conf/wgetrc"        ".wgetrc"
     link "conf/editorconfig"  ".editorconfig"

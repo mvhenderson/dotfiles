@@ -73,7 +73,6 @@ declare -A cleaners=(
     [launch]=false
 )
 
-pattern="*.DS_Store"
 dry_run=;
 for opt in $@; do  #TODO: will not support spaces in pattern for file=pattern
     case $opt in
@@ -85,6 +84,7 @@ for opt in $@; do  #TODO: will not support spaces in pattern for file=pattern
         file*)
             cleaners[file]=true
             pattern="${opt#*=}"
+            if [[ $pattern == $opt ]]; then pattern="*.DS_Store"; fi;
             ;;
         trash)
             cleaners[$opt]=true

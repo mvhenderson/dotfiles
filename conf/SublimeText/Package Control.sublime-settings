@@ -4,7 +4,9 @@
 		"ApacheConf.tmLanguage",
 		"DocBlockr",
 		"EditorConfig",
+		"Git",
 		"Git Config",
+		"GitGutter",
 		"Handlebars",
 		"HTML-CSS-JS Prettify",
 		"Indent XML",
@@ -14,6 +16,7 @@
 		"Pretty JSON",
 		"Solarized Color Scheme",
 		"Sublime Bookmarks",
+		"sublime-github",
 		"Theme - Sodarized"
 	]
 }

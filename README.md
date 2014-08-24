@@ -29,6 +29,9 @@ bash -c "$(curl -fsSL raw.github.com/mvhenderson/dotfiles/master/bin/dotfiles)"
 ### Sublime Text 3
 
 * Install the package manager <https://sublime.wbond.net/installation>
+* Copy the following config files (which contain API keys)
+    - Evernote.sublime-settings
+    - GitHub.sublime-settings
 
 ### Day-O
 

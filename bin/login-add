@@ -1,0 +1,39 @@
+#!/usr/bin/env bash
+
+# % login-add(1) LICENSE: MIT | Dotfile Utilities
+# % Mike Henderson <https://github.com/mvhenderson/dotfiles>
+# % August 26, 2014
+#
+# NAME
+# ====
+#
+# __login-add__ - Add item to user login
+#
+# USAGE
+# =====
+#
+# __login-add__ path_to_app [hidden] [name]
+#
+# DESCRIPTION
+# ===========
+#
+# Add the given app to the user login itmes, optionally to start _hidden_ and/or
+# with a custom _name_ in the System Preferences dialog.
+#
+# EXAMPLE
+# =======
+#
+#     login-add ~/.dotfiles/login/dropbox-private.app true
+#
+# REFERENCE
+# =========
+# <http://hamstergene.github.io/blog/2013-07-04-os-x-login-items-command-line/>
+# - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+if [ $(type -P show-help) ]; then
+    show-help "$1" "$BASH_SOURCE" true && exit
+fi
+
+HIDDEN=${2:-false}
+NAME=${3:-$(basename $1)}
+
+osascript -e "tell application \"System Events\" to make login item at end with properties {path:\"$1\", hidden:$HIDDEN, name:\"$NAME\"}"

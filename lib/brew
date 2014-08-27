@@ -32,6 +32,7 @@ declare -a brew_formulae=(
     'rename'
     'timedog'
     'xmlstarlet'
+    'encfs'
 )
 
 declare -a brew_casks=(

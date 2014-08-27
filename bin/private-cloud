@@ -1,0 +1,46 @@
+#!/usr/bin/env bash
+
+# % private-cloud(1) LICENSE: MIT | Dotfile Utilities
+# % Mike Henderson <https://github.com/mvhenderson/dotfiles>
+# % August 26, 2014
+#
+# NAME
+# ====
+#
+# __private-cloud__ - Mount private encrypted folder for dropbox
+#
+# USAGE
+# =====
+#
+# __private-cloud__ encrypted_dir directory
+#
+# DESCRIPTION
+# ===========
+#
+# Ties the files in *directory* to a the *encrypted_dir*. Unless the command
+# _security_ has been given "Always Allow" access to the keychain a GUI dialog
+# will ask for access.
+#
+# This script should be setup to launch on login to support sensitive config
+# list Sublime Text package preferences that contain API keys.
+#
+# EXAMPLE
+# =======
+#
+#     private-cloud ~/Dropbox/Private ~/Private
+#
+# REFERENCE
+# =========
+# <http://www.maketecheasier.com/install-encfs-mac/>
+# <http://softwarenerd.org/archives/576>
+# <http://emmanuelbernard.com/blog/2013/07/01/encrypt-your-dropbox-with-encfs-on-mac-os-x/>
+# - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+if [ $(type -P show-help) ]; then
+    show-help "$1" "$BASH_SOURCE" && exit
+fi
+
+ENCDIR="${1:-$HOME/Dropbox/Private}"
+DECDIR="${2:-$HOME/Private}"
+
+security find-generic-password -ga encfs -w \
+| /usr/local/bin/encfs -S "$ENCDIR" "$DECDIR" -o volname="Private"

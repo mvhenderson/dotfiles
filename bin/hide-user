@@ -1,0 +1,22 @@
+#!/usr/bin/env bash
+
+# % hide-user(1) LICENSE: MIT | Dotfile Utilities
+# % Mike Henderson <https://github.com/mvhenderson/dotfiles>
+# % August 26, 2014
+#
+# NAME
+# ====
+#
+# __hide-user__ - Hide given user(s) from OS X login screen
+#
+# USAGE
+# =====
+#
+# __hide-user__ *users...*
+# - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+# http://support.apple.com/kb/HT5017
+
+show-help "$1" "$BASH_SOURCE"  true && exit
+
+sudo defaults write /Library/Preferences/com.apple.loginwindow \
+HiddenUsersList -array-add "$@"

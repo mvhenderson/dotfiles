@@ -162,7 +162,7 @@ is_gitconfig_changed() {
     cat "${src}" | egrep -v "(\[user\]|name = |email = )" >$new
 
     local diff=false
-    diff -B "${cur}" "${new}" || diff=true
+    diff -w "${cur}" "${new}" || diff=true
 
     rm -f "${cur}" "${new}"
 

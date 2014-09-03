@@ -19,12 +19,15 @@ bash -c "$(curl -fsSL raw.github.com/mvhenderson/dotfiles/master/bin/dotfiles)"
 
 * Answer prompts
 * Change hotkey to -Space
+* Add powerpack license
+* Setup config sync
 * `brew cask alfred link`
 
 ### Dash
 
 * Make sure Dash starts at login
 * Setup user to hide window on login
+* Alfred integration workflow
 
 ### Sublime Text 3
 
@@ -47,6 +50,19 @@ bash -c "$(curl -fsSL raw.github.com/mvhenderson/dotfiles/master/bin/dotfiles)"
 * Load Solorized colors into default profile
 * Setup hotkey window to use ⌥-Space
 * Change the selection color to base2 (alt light background)
+
+### Encrypted Cloud
+
+Create an encrypted directory for sync to a cloud service like Dropbox. This 
+will encrypt files before uploading. See the links in `./bin/private-cloud` for
+more detail.
+
+* Create directory `~/Private`
+* Add `encfs` to keychain
+    - Open Keychain Access.app
+    - Add item named `encfs` with account `encfs`
+    - Add password for encrypted folder
+* `login-add ~/.dotfiles/login/dropbox-private.app true`
 
 ### Misc
 

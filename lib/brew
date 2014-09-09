@@ -159,7 +159,31 @@ formula_exists() {
     return 0
 }
 
+# Test if a cask is installed, but not necessarily the most recent
 cask_exists() {
-    brew cask list $1 &>/dev/null || return 1
+    # this fails if the cask is installed but on older version
+    # since cask updating is not yet implemented, for now assume
+    # that casks are self updating or manually use --force to update
+    # a specific package using:
+    #
+    #   brew cask install --force ...
+    #
+    # see: https://github.com/caskroom/homebrew-cask/issues/309
+    #
+    # For now, the only cask that needs special care and feeding is pandoc
+    # perhaps it would be beter to just use brew package instead of the cask
+    #
+    # NOTE: --force installing pandoc (and perhaps other casks) will leave
+    # the prior install under /opt/homebrew-cask/Caskroom/pandoc that should
+    # probably also get cleaned up.
+    #
+    # brew cask list $1 &>/dev/null || return 1
+
+    test -d "/opt/homebrew-cask/Caskroom/$1" || return 1
+
+    # Issue a warning if cask has been updated
+    brew cask list $1 &>/dev/null \
+    || log_warning "$1 is installed but outdated"
+
     return 0
 }

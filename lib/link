@@ -12,6 +12,7 @@ run_link() {
     link "conf/editorconfig"  ".editorconfig"
     link "conf/git/gitignore" ".gitignore"
     link "conf/vim/vimrc"     ".vimrc"
+    link "conf/emacs"         ".emacs"
 }
 
 # Link file to home only if target doesn't exist

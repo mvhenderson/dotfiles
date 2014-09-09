@@ -1,0 +1,58 @@
+(display-time)
+ 
+;;; Put auto-saves in temp dir
+(setq backup-directory-alist `((".*" . ,temporary-file-directory)))
+(setq auto-save-file-name-transforms `((".*" ,temporary-file-directory t)))
+ 
+;;; Recent Files
+(require 'recentf)
+(setq recentf-max-menu-items 25)
+(setq recentf-auto-cleanup (quote never))
+(global-set-key "\C-x\ \C-r" 'recentf-open-files)
+; do not attempt to stat remote files, just keep them in the list
+(setq recentf-keep '(file-remote-p file-readable-p))
+(recentf-mode 1)
+ 
+;;; XML Formatter
+(defun bf-pretty-print-xml-region (begin end)
+  "Pretty format XML markup in region. You need to have nxml-mode
+http://www.emacswiki.org/cgi-bin/wiki/NxmlMode installed to do
+this.  The function inserts linebreaks to separate tags that have
+nothing but whitespace between them.  It then indents the markup
+by using nxml's indentation rules."
+  (interactive "r")
+  (save-excursion
+      (nxml-mode)
+      (goto-char begin)
+      (while (search-forward-regexp "\>[ \\t]*\<" nil t)
+        (backward-char) (insert "\n"))
+      (indent-region begin end))
+    (message "Ah, much better!"))
+(global-set-key "\C-x\ p" 'bf-pretty-print-xml-region)
+ 
+;;; Colors
+;(require 'color-theme-solarized)
+;(color-theme-solarized 'light)
+;(setq mvh-fix-cursor-color-timer
+;                (run-with-idle-timer '.25 nil 'color-theme-solarized-light))
+ 
+;;; Custom
+(custom-set-variables
+  ;; custom-set-variables was added by Custom.
+  ;; If you edit it by hand, you could mess it up, so be careful.
+  ;; Your init file should contain only one such instance.
+  ;; If there is more than one, they won't work right.
+'(column-number-mode t)
+'(display-time-mode t)
+'(inhibit-startup-screen t)
+'(initial-scratch-message nil)
+'(make-backup-files nil)
+'(tab-width 2)
+'(tool-bar-mode nil)
+'(visible-bell t))
+(custom-set-faces
+  ;; custom-set-faces was added by Custom.
+  ;; If you edit it by hand, you could mess it up, so be careful.
+  ;; Your init file should contain only one such instance.
+  ;; If there is more than one, they won't work right.
+)

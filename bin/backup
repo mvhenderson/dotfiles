@@ -19,7 +19,7 @@
 # ===========
 #
 # Create a bootable backup of the root directory. Requires __rsync__ 3. Uses the
-# _~/.dotfiles/bin/.backupignore_ file to specify directories to ignore.
+# _<bash source dir>/.backupignore_ file to specify directories to ignore.
 # - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 
 show-help "$1" "$BASH_SOURCE" && exit
@@ -29,7 +29,7 @@ show-help "$1" "$BASH_SOURCE" && exit
 
 DST="/Volumes/BACKUP/"
 SRC="/"
-EXCLUDE="$HOME/.dotfiles/bin/.backupignore"
+EXCLUDE="$(dirname $BASH_SOURCE)/.backupignore"
 PROG=$0
 
 # Ask for the administrator password upfront and keep alive

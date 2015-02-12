@@ -1,4 +1,7 @@
 {
+	"in_process_packages":
+	[
+	],
 	"installed_packages":
 	[
 		"ApacheConf.tmLanguage",
@@ -14,6 +17,7 @@
 		"JSHint",
 		"LESS",
 		"Markdown Preview",
+		"Package Control",
 		"Pretty JSON",
 		"Solarized Color Scheme",
 		"Sublime Bookmarks",

@@ -14,6 +14,7 @@ path_prepend () { path_remove $1; [[ -d "$1" ]] && export PATH="$1:$PATH"; }
 path_remove ()  { export PATH=`echo -n $PATH | awk -v RS=: -v ORS=: '$0 != "'$1'"' | sed 's/:$//'`; }
 
 path_prepend "/usr/local/bin"
+path_prepend "/usr/local/sbin"
 # path_prepend "$(brew --prefix coreutils)/libexec/gnubin" # Override OS X utils
 
 path_append "${DOTFILES_DIR}/bin"

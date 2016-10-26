@@ -1,28 +1,17 @@
 {
+	"bootstrapped": true,
 	"in_process_packages":
 	[
 	],
 	"installed_packages":
 	[
-		"ApacheConf.tmLanguage",
-		"DocBlockr",
 		"EditorConfig",
-		"Evernote",
-		"Git",
-		"Git Config",
-		"GitGutter",
-		"Handlebars",
-		"HTML-CSS-JS Prettify",
 		"Indent XML",
-		"JSHint",
-		"LESS",
-		"Markdown Preview",
 		"Package Control",
-		"Pretty JSON",
 		"Solarized Color Scheme",
-		"Sublime Bookmarks",
-		"sublime-github",
+		"SublimeLinter",
+		"SublimeLinter-contrib-tslint",
 		"Theme - Sodarized",
-		"Unquote"
+		"TypeScript"
 	]
 }

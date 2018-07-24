@@ -356,6 +356,8 @@ alias plistbuddy="/usr/libexec/PlistBuddy"
 # Copy w/ progress - credit:paulirish
 alias cwp="rsync -WavP --human-readable --progress"
 
+# delete merged branches - credit:https://stackoverflow.com/questions/13064613/how-to-prune-local-tracking-branches-that-do-not-exist-on-remote-anymore/16906759#16906759
+alias gitDeleteMerged="git branch --merged master | grep -v '^[ *]*master$' | xargs git branch -d"
 
 ##############################################################################
 # Functions

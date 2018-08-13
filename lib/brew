@@ -33,17 +33,18 @@ declare -a brew_formulae=(
     'timedog'
     'xmlstarlet'
     'encfs'
+    'pandoc'
+
 )
 
 declare -a brew_casks=(
     'alfred'
-    'betterzipql'
+    'betterzip'
     'cert-quicklook'
     'colorpicker-developer'
     'dash'
     'itsycal'
     'iterm2'
-    'pandoc'
     'sublime-text3'
     'qlcolorcode'
     'qlmarkdown'
